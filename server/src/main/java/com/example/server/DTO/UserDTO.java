@@ -1,34 +1,22 @@
-package com.example.server.model;
+package com.example.server.DTO;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.util.ArrayList;
 import java.util.List;
 
-@Document(collection = "users")
-public class User {
-
-    @Id
+public class UserDTO {
     private String userId;
-
     private String name;
-
-    @Indexed(unique = true)
     private String email;
+    private String role;
+    private List<String> favorites;
 
-    private String password;
-    private String role; // e.g., USER / ADMIN
-    private List<String> favorites = new ArrayList<>();
+    public UserDTO() {}
 
-    public User() {}
-
-    public User(String name, String email, String password, String role) {
+    public UserDTO(String userId, String name, String email, String role, List<String> favorites) {
+        this.userId = userId;
         this.name = name;
         this.email = email;
-        this.password = password;
         this.role = role;
+        this.favorites = favorites;
     }
 
     // Getters and Setters
@@ -40,9 +28,6 @@ public class User {
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
-
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
 
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
