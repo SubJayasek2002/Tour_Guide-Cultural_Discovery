@@ -26,7 +26,10 @@ public class EventServiceImpl implements EventService {
     @Override
     public void removeEvent(String eventName){
         Event event = eventRepository.findByEventName(eventName);
-        eventRepository.delete(event);
+        if(event != null){
+            eventRepository.delete(event);
+        }
+
     }
 
     @Override
