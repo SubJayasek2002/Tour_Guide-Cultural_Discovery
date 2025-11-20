@@ -1,21 +1,20 @@
-package com.example.Events.DTO;
+package com.example.Events.Model;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
 
+@Document
 @AllArgsConstructor
 @NoArgsConstructor
-public class EventDTO {
-
-    @NotBlank(message="Event Name Cannot be empty")
+public class Event {
+    @Id
+    private String id;
     private String eventName;
-
-    @NotBlank(message="Event Location Cannot be empty")
     private String location;
-
     private Date date;
     private String description;
 }
