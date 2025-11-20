@@ -1,5 +1,7 @@
 package com.example.Events.Entity;
 
-@Entity
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document
 public class Event {
 }
