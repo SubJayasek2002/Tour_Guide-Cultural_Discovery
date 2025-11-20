@@ -1,9 +1,30 @@
 package com.example.Events.Controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.example.Events.DTO.EventDTO;
+import com.example.Events.Model.Event;
+import com.example.Events.Service.EventService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping
 public class EventController {
+    @Autowired
+    private EventService eventService;
+
+    @PostMapping
+    public EventDTO addNewEvent(@RequestBody EventDTO eventDTO){
+        return eventService.addEvent(eventDTO);
+    }
+
+    @DeleteMapping
+    public String deleteEventByName(@RequestParam String eventName){
+        eventService.removeEvent(eventName);
+        return eventName + "is deleted";
+    }
+
+    @GetMapping
+    public EventDTO getEventBYLocation(@RequestParam String location){
+        return eventService.findByLocation(location);
+    }
 }
