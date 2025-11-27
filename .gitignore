@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+# Local project files
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
@@ -32,11 +32,11 @@ build/
 
 ### VS Code ###
 .vscode/
-=======
+
 # Compiled class file
 *.class
 
-# Log file
+# Log files
 *.log
 
 # BlueJ files
@@ -45,7 +45,7 @@ build/
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
-# Package Files #
+# Package Files
 *.jar
 *.war
 *.nar
@@ -54,7 +54,6 @@ build/
 *.tar.gz
 *.rar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+# Virtual machine crash logs
 hs_err_pid*
 replay_pid*
->>>>>>> 5e3d814b56a2a009ee9f40b09919d7959c4bfdce
