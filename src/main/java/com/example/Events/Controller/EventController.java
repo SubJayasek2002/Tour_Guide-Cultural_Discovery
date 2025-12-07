@@ -1,7 +1,6 @@
 package com.example.Events.Controller;
 
 import com.example.Events.DTO.EventDTO;
-import com.example.Events.Model.Event;
 import com.example.Events.Service.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +24,7 @@ public class EventController {
     }
 
     @GetMapping
-    public EventDTO getEventBYLocation(@RequestParam String location){
+    public EventDTO getEventByLocation(@RequestParam String location){
         return eventService.findByLocation(location);
     }
 }
