@@ -141,6 +141,7 @@ public class EventServiceImpl implements EventService {
                 .orElseThrow(() -> new ResourceNotFoundException("Event with ID " + id + " not found"));
         //Deletion of the event by id
         eventRepository.deleteById(id);
+        System.out.println("Event with ID " + id + " is deleted!!!");
 
     }
 
@@ -158,6 +159,7 @@ public class EventServiceImpl implements EventService {
 
         // Delete using the event name
         eventRepository.deleteByEventName(eventName);
+        System.out.println("The Event "+ eventName + " is deleted!!!");
     }
 
     @Override
@@ -173,6 +175,7 @@ public class EventServiceImpl implements EventService {
         }
         //Delete using the event date
         eventRepository.deleteByDate(date);
+        System.out.println("All the events scheduled on " + date + " are deleted!!!");
     }
 
     @Override

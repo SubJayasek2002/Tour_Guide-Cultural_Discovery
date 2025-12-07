@@ -19,9 +19,6 @@ public interface EventService {
     List<EventDTO> getByDate(Date date);
 
     EventDTO updateEvent(EventDTO eventDTO);
-    /*EventDTO updateEventByName(String eventName,EventDTO eventDTO);
-    EventDTO updateEventByLocation(String location,EventDTO eventDTO);
-    EventDTO updateEventByDate(Date date,EventDTO eventDTO);*/
 
     void removeEvent(String id);
     void removeEventByName(String eventName);
