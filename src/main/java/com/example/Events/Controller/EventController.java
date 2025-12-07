@@ -13,18 +13,8 @@ public class EventController {
     private EventService eventService;
 
     @PostMapping
-    public EventDTO addNewEvent(@RequestBody EventDTO eventDTO){
+    public EventDTO AddNewEvent(@RequestBody EventDTO eventDTO){
         return eventService.addEvent(eventDTO);
     }
 
-    @DeleteMapping
-    public String deleteEventByName(@RequestParam String eventName){
-        eventService.removeEvent(eventName);
-        return eventName + "is deleted";
-    }
-
-    @GetMapping
-    public EventDTO getEventByLocation(@RequestParam String location){
-        return eventService.findByLocation(location);
-    }
 }
