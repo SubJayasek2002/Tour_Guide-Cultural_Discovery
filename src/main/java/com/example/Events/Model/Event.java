@@ -9,7 +9,7 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Document
 @AllArgsConstructor
@@ -22,6 +22,6 @@ public class Event {
     private String id;
     private String eventName;
     private String location;
-    private Date date;
+    private LocalDate date;
     private String description;
 }

@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Transactional
@@ -29,27 +29,25 @@ public class EventServiceImpl implements EventService {
         // Map DTO to Entity
         Event newEvent = eventMapper.toEntity(eventDTO);
 
-        // Validate event name
-        if (newEvent.getEventName() == null || newEvent.getEventName().trim().isEmpty()) {
-            throw new BadRequestException("Event name cannot be empty");
-        }
+            // Validate event name
+            if (newEvent.getEventName() == null || newEvent.getEventName().trim().isEmpty()) {
+                throw new BadRequestException("Event name cannot be empty");
+            }
 
-        // Validate location
-        if (newEvent.getLocation() == null || newEvent.getLocation().trim().isEmpty()) {
-            throw new BadRequestException("Event location cannot be empty");
-        }
+            // Validate location
+            if (newEvent.getLocation() == null || newEvent.getLocation().trim().isEmpty()) {
+                throw new BadRequestException("Event location cannot be empty");
+            }
 
-        // Validate date
-        if (newEvent.getDate() == null) {
-            throw new BadRequestException("Event date cannot be empty");
-        }
-        if (newEvent.getDate().before(new Date())) {
-            throw new BadRequestException("Event date cannot be in the past");
-        }
+            //Validate the date
+            if (newEvent.getDate() == null) {
+                throw new BadRequestException("Event date cannot be empty");
+            }
+
+
 
         // Save entity
         Event savedEvent = eventRepository.save(newEvent);
-
         // Map back to DTO for response
         return eventMapper.toDTO(savedEvent);
     }
@@ -94,9 +92,9 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<EventDTO> getByDate(Date date) {
+    public List<EventDTO> getByDate(LocalDate date) {
         if (date == null) {
-            throw new BadRequestException("Date cannot be empty");
+            throw new BadRequestException("Date cannot be null");
         }
 
         List<Event> events = eventRepository.findByDate(date);
@@ -107,6 +105,7 @@ public class EventServiceImpl implements EventService {
 
         return eventMapper.toDTOList(events);
     }
+
 
     @Override
     public EventDTO updateEvent(EventDTO eventDTO) {
@@ -162,8 +161,9 @@ public class EventServiceImpl implements EventService {
         System.out.println("The Event "+ eventName + " is deleted!!!");
     }
 
+
     @Override
-    public void removeEventByDate(Date date) {
+    public void removeEventByDate(LocalDate date) {
         if (date == null) {
             throw new BadRequestException("Event date cannot be empty for deletion");
         }
@@ -194,3 +194,4 @@ public class EventServiceImpl implements EventService {
         System.out.println("All the events in " + location + " are deleted!!!");
     }
 }
+

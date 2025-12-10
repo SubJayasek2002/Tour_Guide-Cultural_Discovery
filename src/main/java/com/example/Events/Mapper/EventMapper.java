@@ -42,6 +42,7 @@ public class EventMapper {
         entity.setEventName(dto.getEventName());
         entity.setLocation(dto.getLocation());
         entity.setDate(dto.getDate());
+        entity.setDescription(dto.getDescription());
 
         //Returning the Mapped Entity Object
         return entity;

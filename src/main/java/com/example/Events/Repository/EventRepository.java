@@ -4,9 +4,9 @@ import com.example.Events.Model.Event;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
+
 
 @Repository
 public interface EventRepository extends MongoRepository<Event, String> {
@@ -19,7 +19,7 @@ public interface EventRepository extends MongoRepository<Event, String> {
     List<Event> findByLocation(String location);
 
     // Equivalent to your getByDate (returns a list as date is not unique)
-    List<Event> findByDate(Date date);
+    List<Event> findByDate(LocalDate date);
 
     // --- DELETE OPERATIONS ---
 
@@ -30,7 +30,7 @@ public interface EventRepository extends MongoRepository<Event, String> {
     void deleteByLocation(String location);
 
     // Equivalent to your removeEventByDate
-    void deleteByDate(Date date);
+    void deleteByDate(LocalDate date);
 
     //  save() and findById() are inherited from MongoRepository
 }
