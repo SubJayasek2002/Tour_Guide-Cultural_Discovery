@@ -14,6 +14,7 @@ import DestinationDetail from './pages/destinations/DestinationDetail';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ManageEvents from './pages/admin/ManageEvents';
 import ManageDestinations from './pages/admin/ManageDestinations';
+import ManageUsers from './pages/admin/ManageUsers';
 
 function App() {
   return (
@@ -93,6 +94,16 @@ function App() {
               <ProtectedRoute adminOnly>
                 <Layout>
                   <ManageDestinations />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/users"
+            element={
+              <ProtectedRoute adminOnly>
+                <Layout>
+                  <ManageUsers />
                 </Layout>
               </ProtectedRoute>
             }

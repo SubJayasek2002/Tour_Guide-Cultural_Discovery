@@ -64,6 +64,31 @@ export const authAPI = {
     }),
 };
 
+// Users API (Admin only)
+export const usersAPI = {
+  getAll: () =>
+    apiRequest('/users', {
+      headers: getAuthHeaders(),
+    }),
+
+  getById: (userId: string) =>
+    apiRequest(`/users/${userId}`, {
+      headers: getAuthHeaders(),
+    }),
+
+  toggleStatus: (userId: string) =>
+    apiRequest(`/users/${userId}/toggle-status`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+    }),
+
+  delete: (userId: string) =>
+    apiRequest(`/users/${userId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    }),
+};
+
 // Events API
 export const eventsAPI = {
   getAll: () => apiRequest('/events'),
