@@ -36,3 +36,16 @@ export interface Review {
   imageUrls?: string[];
   timestamp: string;
 }
+
+export interface User {
+  id: string;
+  username: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  roles: string[];
+  enabled: boolean;
+  createdAt: string;
+  lastLoginAt?: string;
+}
