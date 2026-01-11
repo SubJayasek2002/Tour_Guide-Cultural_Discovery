@@ -6,6 +6,8 @@ export interface Event {
   start?: string;
   end?: string;
   location: string;
+  latitude?: number; // Geographic coordinate for map integration
+  longitude?: number; // Geographic coordinate for map integration
   timestamp: string;
   createdById: string;
   createdByUsername: string;
@@ -18,6 +20,8 @@ export interface Destination {
   imageUrls: string[];
   bestSeasonToVisit?: string;
   location: string;
+  latitude?: number; // Geographic coordinate for map integration
+  longitude?: number; // Geographic coordinate for map integration
   timestamp: string;
   createdById: string;
   createdByUsername: string;
