@@ -5,8 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Plus, Edit, Trash2, X, Calendar, Search } from 'lucide-react';
+import MapPicker from '@/components/shared/MapPicker';
 import {
   Dialog,
   DialogContent,
@@ -36,6 +37,8 @@ export default function ManageEvents() {
     title: '',
     description: '',
     location: '',
+    latitude: undefined as number | undefined,
+    longitude: undefined as number | undefined,
     start: '',
     end: '',
     imageUrls: [] as string[],
@@ -64,6 +67,8 @@ export default function ManageEvents() {
         title: event.title,
         description: event.description,
         location: event.location,
+        latitude: event.latitude,
+        longitude: event.longitude,
         start: event.start || '',
         end: event.end || '',
         imageUrls: event.imageUrls || [],
@@ -74,6 +79,8 @@ export default function ManageEvents() {
         title: '',
         description: '',
         location: '',
+        latitude: undefined,
+        longitude: undefined,
         start: '',
         end: '',
         imageUrls: [],
@@ -262,6 +269,16 @@ export default function ManageEvents() {
                 value={formData.location}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                 required
+              />
+            </div>
+
+            <div>
+              <MapPicker
+                latitude={formData.latitude}
+                longitude={formData.longitude}
+                onLocationSelect={(lat, lng) => {
+                  setFormData({ ...formData, latitude: lat, longitude: lng });
+                }}
               />
             </div>
 

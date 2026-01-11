@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { Plus, Edit, Trash2, X, MapPin, Search } from 'lucide-react';
+import MapPicker from '@/components/shared/MapPicker';
 import {
   Dialog,
   DialogContent,
@@ -36,6 +37,8 @@ export default function ManageDestinations() {
     title: '',
     description: '',
     location: '',
+    latitude: undefined as number | undefined,
+    longitude: undefined as number | undefined,
     bestSeasonToVisit: '',
     imageUrls: [] as string[],
   });
@@ -63,6 +66,8 @@ export default function ManageDestinations() {
         title: destination.title,
         description: destination.description,
         location: destination.location,
+        latitude: destination.latitude,
+        longitude: destination.longitude,
         bestSeasonToVisit: destination.bestSeasonToVisit || '',
         imageUrls: destination.imageUrls || [],
       });
@@ -72,6 +77,8 @@ export default function ManageDestinations() {
         title: '',
         description: '',
         location: '',
+        latitude: undefined,
+        longitude: undefined,
         bestSeasonToVisit: '',
         imageUrls: [],
       });
@@ -263,6 +270,16 @@ export default function ManageDestinations() {
                 value={formData.location}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                 required
+              />
+            </div>
+
+            <div>
+              <MapPicker
+                latitude={formData.latitude}
+                longitude={formData.longitude}
+                onLocationSelect={(lat, lng) => {
+                  setFormData({ ...formData, latitude: lat, longitude: lng });
+                }}
               />
             </div>
 
