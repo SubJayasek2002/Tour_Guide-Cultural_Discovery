@@ -4,12 +4,14 @@ import { eventsAPI } from '@/services/api';
 import type { Event } from '@/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, MapPin, Clock } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Calendar, MapPin, Clock, Search } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function Events() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -58,6 +60,15 @@ export default function Events() {
     );
   }
 
+  // Filter events based on search query
+  const filteredEvents = events.filter((event) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      event.title.toLowerCase().includes(query) ||
+      event.description?.toLowerCase().includes(query)
+    );
+  });
+
   return (
     <div className="container mx-auto px-4 py-12">
       {/* Hero Section */}
@@ -71,15 +82,31 @@ export default function Events() {
         </p>
       </div>
 
+      {/* Search Bar */}
+      <div className="mb-8 max-w-2xl mx-auto">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <Input
+            type="text"
+            placeholder="Search events by title or description..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 py-6 text-base"
+          />
+        </div>
+      </div>
+
       {/* Events Grid */}
-      {events.length === 0 ? (
+      {filteredEvents.length === 0 ? (
         <div className="text-center py-12">
           <Calendar className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500 text-lg">No events available at the moment</p>
+          <p className="text-gray-500 text-lg">
+            {searchQuery ? 'No events found matching your search' : 'No events available at the moment'}
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {events.map((event) => (
+          {filteredEvents.map((event) => (
             <Link key={event.id} to={`/events/${event.id}`}>
               <Card className="group h-full overflow-hidden hover:shadow-xl transition-shadow duration-300">
                 {/* Image */}

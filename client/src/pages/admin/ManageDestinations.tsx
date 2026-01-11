@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
-import { Plus, Edit, Trash2, X, MapPin } from 'lucide-react';
+import { Plus, Edit, Trash2, X, MapPin, Search } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -31,6 +31,7 @@ export default function ManageDestinations() {
   const [showForm, setShowForm] = useState(false);
   const [editingDestination, setEditingDestination] = useState<Destination | null>(null);
   const [deleteDestinationId, setDeleteDestinationId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -129,6 +130,15 @@ export default function ManageDestinations() {
     }
   };
 
+  const filteredDestinations = destinations.filter((destination) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      destination.title.toLowerCase().includes(query) ||
+      destination.description?.toLowerCase().includes(query) ||
+      destination.location?.toLowerCase().includes(query)
+    );
+  });
+
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="flex items-center justify-between mb-8">
@@ -142,17 +152,33 @@ export default function ManageDestinations() {
         </Button>
       </div>
 
+      <div className="mb-8 max-w-2xl">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <Input
+            placeholder="Search destinations by title, description, or location..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 py-6 text-base"
+          />
+        </div>
+      </div>
+
       {/* Destinations List */}
-      {destinations.length === 0 ? (
+      {filteredDestinations.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
             <MapPin className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500">No destinations yet. Create your first destination!</p>
+            <p className="text-gray-500">
+              {searchQuery
+                ? 'No destinations match your search.'
+                : 'No destinations yet. Create your first destination!'}
+            </p>
           </CardContent>
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {destinations.map((destination) => (
+          {filteredDestinations.map((destination) => (
             <Card key={destination.id}>
               <div className="relative h-48 bg-gray-200">
                 {destination.imageUrls && destination.imageUrls.length > 0 ? (

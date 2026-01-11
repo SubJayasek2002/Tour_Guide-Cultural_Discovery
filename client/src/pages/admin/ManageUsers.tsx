@@ -4,7 +4,8 @@ import type { User } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { UserX, UserCheck, Trash2, Users, Shield, Mail, Phone, Calendar } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { UserX, UserCheck, Trash2, Users, Shield, Mail, Phone, Calendar, Search } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,6 +31,7 @@ export default function ManageUsers() {
   const [loading, setLoading] = useState(true);
   const [deleteUserId, setDeleteUserId] = useState<string | null>(null);
   const [toggleUserId, setToggleUserId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchUsers();
@@ -82,6 +84,16 @@ export default function ManageUsers() {
 
   const getUserToToggle = () => users.find((u) => u.id === toggleUserId);
 
+  const filteredUsers = users.filter((user) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      `${user.firstName} ${user.lastName}`.toLowerCase().includes(query) ||
+      user.username.toLowerCase().includes(query) ||
+      user.email.toLowerCase().includes(query) ||
+      user.phoneNumber?.toLowerCase().includes(query)
+    );
+  });
+
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-12">
@@ -104,6 +116,18 @@ export default function ManageUsers() {
         </div>
         <p className="text-gray-600 mt-1">View and manage user accounts</p>
       </div>
+
+        <div className="mb-8 max-w-2xl">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <Input
+              placeholder="Search users by name, username, email, or phone..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 py-6 text-base"
+            />
+          </div>
+        </div>
 
       {/* User Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
@@ -167,93 +191,95 @@ export default function ManageUsers() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {users.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell>
-                      <div>
-                        <p className="font-semibold text-gray-900">
-                          {user.firstName} {user.lastName}
-                        </p>
-                        <p className="text-sm text-gray-500">@{user.username}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        <div className="flex items-center text-sm text-gray-600">
-                          <Mail className="h-3 w-3 mr-1" />
-                          {user.email}
-                        </div>
-                        <div className="flex items-center text-sm text-gray-600">
-                          <Phone className="h-3 w-3 mr-1" />
-                          {user.phoneNumber}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex flex-wrap gap-1">
-                        {user.roles.map((role) => (
-                          <Badge
-                            key={role}
-                            variant={role === 'ROLE_ADMIN' ? 'default' : 'secondary'}
-                            className={
-                              role === 'ROLE_ADMIN'
-                                ? 'bg-purple-600'
-                                : ''
-                            }
-                          >
-                            {role === 'ROLE_ADMIN' ? 'Admin' : 'User'}
-                          </Badge>
-                        ))}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={user.enabled ? 'default' : 'secondary'}
-                        className={
-                          user.enabled ? 'bg-green-600' : 'bg-gray-500'
-                        }
-                      >
-                        {user.enabled ? 'Active' : 'Disabled'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center text-sm text-gray-600">
-                        <Calendar className="h-3 w-3 mr-1" />
-                        {formatDate(user.createdAt)}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setToggleUserId(user.id)}
-                        >
-                          {user.enabled ? (
-                            <>
-                              <UserX className="h-4 w-4 mr-1" />
-                              Disable
-                            </>
-                          ) : (
-                            <>
-                              <UserCheck className="h-4 w-4 mr-1" />
-                              Enable
-                            </>
-                          )}
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setDeleteUserId(user.id)}
-                          className="text-red-600 hover:text-red-700"
-                        >
-                          <Trash2 className="h-4 w-4 mr-1" />
-                          Delete
-                        </Button>
-                      </div>
+                {filteredUsers.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-6 text-gray-500">
+                      {searchQuery ? 'No users match your search.' : 'No users available.'}
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  filteredUsers.map((user) => (
+                    <TableRow key={user.id}>
+                      <TableCell>
+                        <div>
+                          <p className="font-semibold text-gray-900">
+                            {user.firstName} {user.lastName}
+                          </p>
+                          <p className="text-sm text-gray-500">@{user.username}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-1">
+                          <div className="flex items-center text-sm text-gray-600">
+                            <Mail className="h-3 w-3 mr-1" />
+                            {user.email}
+                          </div>
+                          <div className="flex items-center text-sm text-gray-600">
+                            <Phone className="h-3 w-3 mr-1" />
+                            {user.phoneNumber}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          {user.roles.map((role) => (
+                            <Badge
+                              key={role}
+                              variant={role === 'ROLE_ADMIN' ? 'default' : 'secondary'}
+                              className={role === 'ROLE_ADMIN' ? 'bg-purple-600' : ''}
+                            >
+                              {role === 'ROLE_ADMIN' ? 'Admin' : 'User'}
+                            </Badge>
+                          ))}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={user.enabled ? 'default' : 'secondary'}
+                          className={user.enabled ? 'bg-green-600' : 'bg-gray-500'}
+                        >
+                          {user.enabled ? 'Active' : 'Disabled'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center text-sm text-gray-600">
+                          <Calendar className="h-3 w-3 mr-1" />
+                          {formatDate(user.createdAt)}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end space-x-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setToggleUserId(user.id)}
+                          >
+                            {user.enabled ? (
+                              <>
+                                <UserX className="h-4 w-4 mr-1" />
+                                Disable
+                              </>
+                            ) : (
+                              <>
+                                <UserCheck className="h-4 w-4 mr-1" />
+                                Enable
+                              </>
+                            )}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setDeleteUserId(user.id)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="h-4 w-4 mr-1" />
+                            Delete
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </div>
