@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { MapPin, Sun, ArrowLeft, Image as ImageIcon, Star } from 'lucide-react';
 import ImageSlider from '@/components/shared/ImageSlider';
+import LocationMapPopup from '@/components/shared/LocationMapPopup';
 import ReviewCard from '@/components/reviews/ReviewCard';
 import ReviewForm from '@/components/reviews/ReviewForm';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -20,6 +21,7 @@ export default function DestinationDetail() {
   const [loading, setLoading] = useState(true);
   const [showImageSlider, setShowImageSlider] = useState(false);
   const [showReviewForm, setShowReviewForm] = useState(false);
+  const [showLocationMap, setShowLocationMap] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -159,9 +161,20 @@ export default function DestinationDetail() {
             {/* Destination Details */}
             <div className="space-y-3 text-gray-600">
               {destination.location && (
-                <div className="flex items-start space-x-3">
-                  <MapPin className="h-5 w-5 text-orange-500 mt-0.5 flex-shrink-0" />
-                  <p className="font-medium">{destination.location}</p>
+                <div className="flex items-start space-x-3 justify-between">
+                  <div className="flex items-start space-x-3">
+                    <MapPin className="h-5 w-5 text-orange-500 mt-0.5 shrink-0" />
+                    <p className="font-medium">{destination.location}</p>
+                  </div>
+                  {(destination.latitude || destination.longitude) && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowLocationMap(true)}
+                    >
+                      View on Map
+                    </Button>
+                  )}
                 </div>
               )}
 
@@ -255,6 +268,16 @@ export default function DestinationDetail() {
           onClose={() => setShowImageSlider(false)}
         />
       )}
+
+      {/* Location Map Popup */}
+      <LocationMapPopup
+        isOpen={showLocationMap}
+        onClose={() => setShowLocationMap(false)}
+        latitude={destination.latitude}
+        longitude={destination.longitude}
+        title={destination.title}
+        location={destination.location}
+      />
     </div>
   );
 }

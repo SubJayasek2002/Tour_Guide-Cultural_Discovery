@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { MapPin, Calendar, Clock, ArrowLeft, Image as ImageIcon, Star } from 'lucide-react';
 import ImageSlider from '@/components/shared/ImageSlider';
+import LocationMapPopup from '@/components/shared/LocationMapPopup';
 import ReviewCard from '@/components/reviews/ReviewCard';
 import ReviewForm from '@/components/reviews/ReviewForm';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -20,6 +21,7 @@ export default function EventDetail() {
   const [loading, setLoading] = useState(true);
   const [showImageSlider, setShowImageSlider] = useState(false);
   const [showReviewForm, setShowReviewForm] = useState(false);
+  const [showLocationMap, setShowLocationMap] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -193,9 +195,20 @@ export default function EventDetail() {
               )}
 
               {event.location && (
-                <div className="flex items-start space-x-3">
-                  <MapPin className="h-5 w-5 text-orange-500 mt-0.5 flex-shrink-0" />
-                  <p>{event.location}</p>
+                <div className="flex items-start space-x-3 justify-between">
+                  <div className="flex items-start space-x-3">
+                    <MapPin className="h-5 w-5 text-orange-500 mt-0.5 shrink-0" />
+                    <p>{event.location}</p>
+                  </div>
+                  {(event.latitude || event.longitude) && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowLocationMap(true)}
+                    >
+                      View on Map
+                    </Button>
+                  )}
                 </div>
               )}
             </div>
@@ -277,6 +290,16 @@ export default function EventDetail() {
           onClose={() => setShowImageSlider(false)}
         />
       )}
+
+      {/* Location Map Popup */}
+      <LocationMapPopup
+        isOpen={showLocationMap}
+        onClose={() => setShowLocationMap(false)}
+        latitude={event.latitude}
+        longitude={event.longitude}
+        title={event.title}
+        location={event.location}
+      />
     </div>
   );
 }
