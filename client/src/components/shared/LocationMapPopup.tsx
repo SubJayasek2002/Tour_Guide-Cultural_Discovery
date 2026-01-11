@@ -4,9 +4,6 @@ import 'leaflet/dist/leaflet.css';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
 } from '@/components/ui/dialog';
 import { MapPin } from 'lucide-react';
 
@@ -39,14 +36,9 @@ export default function LocationMapPopup({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-full max-w-4xl max-h-[85vh] overflow-hidden flex flex-col">
-        <DialogHeader>
-          <DialogTitle>Location Map</DialogTitle>
-          <DialogDescription>{title}</DialogDescription>
-        </DialogHeader>
-
+      <DialogContent className="w-full overflow-hidden flex">
         {hasCoordinates ? (
-          <div className="flex-1 rounded-lg overflow-hidden border border-gray-300 min-h-[600px]">
+          <div className="flex-1 rounded-lg overflow-hidden border border-gray-300 min-h-150 z-0">
             <MapContainer
               center={[latitude, longitude]}
               zoom={13}
@@ -75,19 +67,6 @@ export default function LocationMapPopup({
             <MapPin className="h-16 w-16 text-gray-300 mb-4" />
             <p className="text-gray-500">Location coordinates not available</p>
             {location && <p className="text-gray-600 text-sm mt-2">{location}</p>}
-          </div>
-        )}
-
-        {hasCoordinates && (
-          <div className="bg-gray-50 p-4 rounded-lg text-sm">
-            <p className="text-gray-700">
-              <span className="font-semibold">Latitude:</span>{' '}
-              <span className="font-mono">{latitude.toFixed(6)}</span>
-            </p>
-            <p className="text-gray-700 mt-1">
-              <span className="font-semibold">Longitude:</span>{' '}
-              <span className="font-mono">{longitude.toFixed(6)}</span>
-            </p>
           </div>
         )}
       </DialogContent>
