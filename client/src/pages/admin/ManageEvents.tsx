@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, Edit, Trash2, X, Calendar } from 'lucide-react';
+import { Plus, Edit, Trash2, X, Calendar, Search } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -31,6 +31,7 @@ export default function ManageEvents() {
   const [showForm, setShowForm] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [deleteEventId, setDeleteEventId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -132,6 +133,15 @@ export default function ManageEvents() {
     }
   };
 
+  const filteredEvents = events.filter((event) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      event.title.toLowerCase().includes(query) ||
+      event.description?.toLowerCase().includes(query) ||
+      event.location?.toLowerCase().includes(query)
+    );
+  });
+
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="flex items-center justify-between mb-8">
@@ -145,17 +155,31 @@ export default function ManageEvents() {
         </Button>
       </div>
 
+      <div className="mb-8 max-w-2xl">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <Input
+            placeholder="Search events by title, description, or location..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 py-6 text-base"
+          />
+        </div>
+      </div>
+
       {/* Events List */}
-      {events.length === 0 ? (
+      {filteredEvents.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
             <Calendar className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500">No events yet. Create your first event!</p>
+            <p className="text-gray-500">
+              {searchQuery ? 'No events match your search.' : 'No events yet. Create your first event!'}
+            </p>
           </CardContent>
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {events.map((event) => (
+          {filteredEvents.map((event) => (
             <Card key={event.id}>
               <div className="relative h-48 bg-gray-200">
                 {event.imageUrls && event.imageUrls.length > 0 ? (
