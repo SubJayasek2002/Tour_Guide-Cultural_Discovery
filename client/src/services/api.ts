@@ -130,6 +130,61 @@ export const eventsAPI = {
     }),
 };
 
+// Hotels API
+export const hotelsAPI = {
+  getAll: () => apiRequest('/hotels'),
+
+  getById: (id: string) => apiRequest(`/hotels/${id}`),
+
+  getNearby: (lat: number, lng: number, radiusKm = 10) =>
+    apiRequest(`/hotels/near?lat=${lat}&lng=${lng}&radiusKm=${radiusKm}`),
+
+  create: (hotelData: {
+    name: string;
+    description: string;
+    address: string;
+    phones?: string[];
+    whatsapp?: string;
+    email?: string;
+    website?: string;
+    amenities?: string[];
+    imageUrls?: string[];
+    latitude: number;
+    longitude: number;
+  }) =>
+    apiRequest('/hotels', {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(hotelData),
+    }),
+
+  update: (id: string, hotelData: Partial<{
+    name: string;
+    description: string;
+    address: string;
+    phones?: string[];
+    whatsapp?: string;
+    email?: string;
+    website?: string;
+    amenities?: string[];
+    imageUrls?: string[];
+    latitude?: number;
+    longitude?: number;
+    isPaid?: boolean;
+  }>) =>
+    apiRequest(`/hotels/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(hotelData),
+    }),
+
+  delete: (id: string) =>
+    apiRequest(`/hotels/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    }),
+};
+
 // Destinations API
 export const destinationsAPI = {
   getAll: () => apiRequest('/destinations'),
