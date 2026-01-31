@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
-import { MapPin, Calendar, User, LogOut, Shield } from 'lucide-react';
+import { MapPin, Calendar, User, LogOut, Shield, Hotel } from 'lucide-react';
 
 export default function Header() {
   const { user, logout, isAdmin } = useAuth();
@@ -48,6 +48,13 @@ export default function Header() {
             >
               <Calendar className="h-4 w-4" />
               <span>Events</span>
+            </Link>
+            <Link
+              to="/hotels"
+              className="text-sm font-medium text-gray-700 hover:text-orange-600 transition-colors flex items-center space-x-1"
+            >
+              <Hotel className="h-4 w-4" />
+              <span>Hotels</span>
             </Link>
             {isAdmin && (
               <Link

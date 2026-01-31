@@ -15,6 +15,7 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import ManageEvents from './pages/admin/ManageEvents';
 import ManageDestinations from './pages/admin/ManageDestinations';
 import ManageUsers from './pages/admin/ManageUsers';
+import Hotels from './pages/hotels/Hotels';
 
 function App() {
   return (
@@ -63,6 +64,14 @@ function App() {
             element={
               <Layout>
                 <DestinationDetail />
+              </Layout>
+            }
+          />
+          <Route
+            path="/hotels"
+            element={
+              <Layout>
+                <Hotels />
               </Layout>
             }
           />
