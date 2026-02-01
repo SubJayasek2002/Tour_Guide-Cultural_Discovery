@@ -41,6 +41,20 @@ export default function Hotels() {
   const [viewMode, setViewMode] = useState<'map' | 'grid'>('map');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
+  const fetchAllPaid = async () => {
+    setLoading(true);
+    try {
+      const data = await hotelsAPI.getAll();
+      setHotels(data);
+      setCenter(DEFAULT_CENTER);
+    } catch (err) {
+      console.error('Failed to load hotels', err);
+      alert('Failed to load hotels');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const fetchNearby = async (lat: number, lng: number, radius: number) => {
     setLoading(true);
     try {
@@ -56,7 +70,7 @@ export default function Hotels() {
   };
 
   useEffect(() => {
-    fetchNearby(DEFAULT_CENTER[0], DEFAULT_CENTER[1], radiusKm);
+    fetchAllPaid();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

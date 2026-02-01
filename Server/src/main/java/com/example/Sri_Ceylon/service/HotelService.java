@@ -5,6 +5,7 @@ import com.example.Sri_Ceylon.dto.HotelResponse;
 import com.example.Sri_Ceylon.dto.UpdateHotelRequest;
 import com.example.Sri_Ceylon.model.Hotel;
 import com.example.Sri_Ceylon.model.PaymentStatus;
+import com.example.Sri_Ceylon.model.Role;
 import com.example.Sri_Ceylon.model.User;
 import com.example.Sri_Ceylon.repository.HotelRepository;
 import com.example.Sri_Ceylon.repository.UserRepository;
@@ -30,6 +31,12 @@ public class HotelService {
     public HotelResponse createHotel(CreateHotelRequest request, String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // If user is not already an admin, grant them HOTEL_OWNER role
+        if (!user.getRoles().contains(Role.ROLE_ADMIN)) {
+            user.getRoles().add(Role.ROLE_HOTEL_OWNER);
+            userRepository.save(user);
+        }
 
         Hotel hotel = new Hotel();
         hotel.setName(request.getName());
@@ -74,7 +81,7 @@ public class HotelService {
     }
 
     public List<HotelResponse> getAllHotels() {
-        return hotelRepository.findAll().stream()
+        return hotelRepository.findByIsPaidTrue().stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
@@ -88,7 +95,7 @@ public class HotelService {
     public List<HotelResponse> getNearbyHotels(Double latitude, Double longitude, double radiusKm) {
         Point point = new Point(longitude, latitude);
         Distance distance = new Distance(radiusKm, Metrics.KILOMETERS);
-        return hotelRepository.findByCoordinatesNear(point, distance)
+        return hotelRepository.findByIsPaidTrueAndCoordinatesNear(point, distance)
                 .stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());

@@ -44,7 +44,7 @@ public class HotelController {
 
     // Admin endpoints (payment flow to be added later)
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<HotelResponse> createHotel(
             @Valid @RequestBody CreateHotelRequest request,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {

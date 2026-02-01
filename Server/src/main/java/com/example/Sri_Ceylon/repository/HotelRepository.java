@@ -8,4 +8,8 @@ import java.util.List;
 
 public interface HotelRepository extends MongoRepository<Hotel, String> {
     List<Hotel> findByCoordinatesNear(Point point, Distance distance);
+
+    List<Hotel> findByIsPaidTrue();
+
+    List<Hotel> findByIsPaidTrueAndCoordinatesNear(Point point, Distance distance);
 }
