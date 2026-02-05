@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { MapPin, Phone, Globe, Building, RefreshCw, Layers, Plus } from 'lucide-react';
+import { AlignLeft, MapPin, Phone, Globe, Building, RefreshCw, Layers, Plus, X } from 'lucide-react';
 import { MapContainer, Marker, Popup, TileLayer, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -39,8 +39,10 @@ export default function Hotels() {
   const [radiusKm, setRadiusKm] = useState(10);
   const [searchLat, setSearchLat] = useState<number | null>(DEFAULT_CENTER[0]);
   const [searchLng, setSearchLng] = useState<number | null>(DEFAULT_CENTER[1]);
-  const [viewMode, setViewMode] = useState<'map' | 'grid'>('map');
+  const [viewMode, setViewMode] = useState<'map' | 'grid'>('grid');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [hasActiveFilter, setHasActiveFilter] = useState(false);
 
   const fetchAllPaid = async () => {
     setLoading(true);
@@ -62,11 +64,38 @@ export default function Hotels() {
       const data = await hotelsAPI.getNearby(lat, lng, radius);
       setHotels(data);
       setCenter([lat, lng]);
+      setHasActiveFilter(true);
     } catch (err) {
       console.error('Failed to load hotels', err);
       alert('Failed to load hotels');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleClearFilters = () => {
+    setSearchQuery('');
+    setHasActiveFilter(false);
+    fetchAllPaid();
+  };
+
+  const handleGetCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setSearchLat(latitude);
+          setSearchLng(longitude);
+          const mapCenter: [number, number] = [latitude, longitude];
+          setCenter(mapCenter);
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+          alert('Unable to get your current location. Please check permissions.');
+        }
+      );
+    } else {
+      alert('Geolocation is not supported by your browser.');
     }
   };
 
@@ -83,6 +112,18 @@ export default function Hotels() {
   const hotelsWithCoords = useMemo(
     () => hotels.filter((h) => h.latitude !== undefined && h.longitude !== undefined),
     [hotels]
+  );
+
+  const filteredHotels = useMemo(
+    () =>
+      hotels.filter((hotel) => {
+        const query = searchQuery.toLowerCase();
+        return (
+          hotel.name.toLowerCase().includes(query) ||
+          hotel.address.toLowerCase().includes(query)
+        );
+      }),
+    [hotels, searchQuery]
   );
 
   return (
@@ -114,16 +155,30 @@ export default function Hotels() {
             >
               <Layers className="h-4 w-4 mr-2" /> Grid View
             </Button>
-          </div>
-          <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+          </div>          
+        </div>
+      </div>
+
+      {/* Search Bar */}
+      <div className="mb-8 flex gap-3 items-center">
+        <div className="flex-1 max-w-2xl relative">
+          <AlignLeft className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <Input
+            placeholder="Search by hotel name or location..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 py-6 text-base"
+          />
+        </div>
+        <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
             <DialogTrigger asChild>
               <Button variant="outline">
-                Search Hotels
+                Map Search
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
-                <DialogTitle>Search Hotels</DialogTitle>
+                <DialogTitle>Search Hotels by Location</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 <div className="rounded-lg overflow-hidden border bg-white h-96">
@@ -159,6 +214,13 @@ export default function Hotels() {
                 <div className="flex gap-2 justify-end">
                   <Button
                     variant="outline"
+                    onClick={handleGetCurrentLocation}
+                    className="mr-auto"
+                  >
+                    <MapPin className="h-4 w-4 mr-2" /> Use Current Location
+                  </Button>
+                  <Button
+                    variant="outline"
                     onClick={() => setIsSearchOpen(false)}
                   >
                     Close
@@ -179,7 +241,15 @@ export default function Hotels() {
               </div>
             </DialogContent>
           </Dialog>
-        </div>
+        {(searchQuery || hasActiveFilter) && (
+          <Button
+            variant="outline"
+            onClick={handleClearFilters}
+            className="text-gray-600 hover:text-gray-900"
+          >
+            <X className="h-4 w-4 mr-2" /> Clear Filters
+          </Button>
+        )}
       </div>
 
       {viewMode === 'map' ? (
@@ -195,7 +265,13 @@ export default function Hotels() {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
-              {hotelsWithCoords.map((hotel) => (
+              {hotelsWithCoords.filter((h) => {
+                const query = searchQuery.toLowerCase();
+                return (
+                  h.name.toLowerCase().includes(query) ||
+                  h.address.toLowerCase().includes(query)
+                );
+              }).map((hotel) => (
                 <Marker key={hotel.id} position={[hotel.latitude!, hotel.longitude!]}> 
                   <Popup>
                     <div className="space-y-1">
@@ -211,7 +287,7 @@ export default function Hotels() {
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            {hotels.map((hotel) => (
+            {filteredHotels.map((hotel) => (
               <Card key={hotel.id} className="border shadow-sm">
                 {hotel.imageUrls && hotel.imageUrls.length > 0 ? (
                   <div className="h-40 w-full overflow-hidden">
@@ -238,9 +314,9 @@ export default function Hotels() {
                     <MapPin className="h-4 w-4 text-orange-500" /> {hotel.address}
                   </p>
                   <div className="flex flex-wrap gap-2 pt-2 border-t">
-                    {hotel.phones?.map((p, idx) => (
+                    {hotel.phones?.map((p) => (
                       <a
-                        key={idx}
+                        key={p}
                         href={`tel:${p}`}
                         className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 hover:bg-blue-200 flex items-center gap-1"
                       >
@@ -286,7 +362,7 @@ export default function Hotels() {
                 </CardContent>
               </Card>
             ))}
-            {hotels.length === 0 && (
+            {filteredHotels.length === 0 && (
               <div className="flex items-center justify-center gap-2 text-gray-500 p-6 border rounded-lg bg-white">
                 <RefreshCw className="h-4 w-4" /> No hotels found for this area.
               </div>
@@ -295,7 +371,7 @@ export default function Hotels() {
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {hotels.map((hotel) => (
+          {filteredHotels.map((hotel) => (
             <Card key={hotel.id} className="border shadow-sm flex flex-col h-full">
               {hotel.imageUrls && hotel.imageUrls.length > 0 ? (
                 <div className="h-48 w-full overflow-hidden">
@@ -329,9 +405,9 @@ export default function Hotels() {
                   ))}
                 </div>
                 <div className="flex flex-wrap gap-2 pt-2 border-t mt-auto">
-                  {hotel.phones?.map((p, idx) => (
+                  {hotel.phones?.map((p) => (
                     <a
-                      key={idx}
+                      key={p}
                       href={`tel:${p}`}
                       className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 hover:bg-blue-200 flex items-center gap-1"
                     >
@@ -370,9 +446,9 @@ export default function Hotels() {
               </CardContent>
             </Card>
           ))}
-          {hotels.length === 0 && (
+          {filteredHotels.length === 0 && (
             <div className="flex items-center justify-center gap-2 text-gray-500 p-6 border rounded-lg bg-white col-span-full">
-              <RefreshCw className="h-4 w-4" /> No hotels found. Use the search to find hotels nearby.
+              <RefreshCw className="h-4 w-4" /> No hotels found. Try adjusting your search.
             </div>
           )}
         </div>
