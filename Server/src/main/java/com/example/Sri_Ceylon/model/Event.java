@@ -18,6 +18,8 @@ public class Event {
     private LocalDateTime start;
     private LocalDateTime end;
     private String location;
+    private Double latitude; // Geographic coordinate
+    private Double longitude; // Geographic coordinate
     private LocalDateTime timestamp;
     
     @DBRef
@@ -29,13 +31,15 @@ public class Event {
     }
 
     public Event(String title, String description, List<String> imageUrls, 
-                 LocalDateTime start, LocalDateTime end, String location, User createdBy) {
+                 LocalDateTime start, LocalDateTime end, String location, Double latitude, Double longitude, User createdBy) {
         this.title = title;
         this.description = description;
         this.imageUrls = imageUrls;
         this.start = start;
         this.end = end;
         this.location = location;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.timestamp = LocalDateTime.now();
         this.createdBy = createdBy;
     }
@@ -95,6 +99,22 @@ public class Event {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
     }
 
     public LocalDateTime getTimestamp() {

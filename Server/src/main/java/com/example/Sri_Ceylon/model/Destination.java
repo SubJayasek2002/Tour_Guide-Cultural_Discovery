@@ -17,6 +17,8 @@ public class Destination {
     private List<String> imageUrls;
     private String bestSeasonToVisit; // Optional field
     private String location;
+    private Double latitude; // Geographic coordinate
+    private Double longitude; // Geographic coordinate
     private LocalDateTime timestamp;
     
     @DBRef
@@ -28,12 +30,14 @@ public class Destination {
     }
 
     public Destination(String title, String description, List<String> imageUrls, 
-                       String bestSeasonToVisit, String location, User createdBy) {
+                       String bestSeasonToVisit, String location, Double latitude, Double longitude, User createdBy) {
         this.title = title;
         this.description = description;
         this.imageUrls = imageUrls;
         this.bestSeasonToVisit = bestSeasonToVisit;
         this.location = location;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.timestamp = LocalDateTime.now();
         this.createdBy = createdBy;
     }
@@ -85,6 +89,22 @@ public class Destination {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
     }
 
     public LocalDateTime getTimestamp() {
