@@ -80,6 +80,13 @@ public class HotelService {
         return mapToResponse(updated);
     }
 
+    public void setHotelPaid(String hotelId) {
+        Hotel hotel = hotelRepository.findById(hotelId)
+                .orElseThrow(() -> new RuntimeException("Hotel not found with id: " + hotelId));
+        hotel.setIsPaid(true);
+        hotelRepository.save(hotel);
+    }
+
     public List<HotelResponse> getAllHotels() {
         return hotelRepository.findByIsPaidTrue().stream()
                 .map(this::mapToResponse)
@@ -105,6 +112,13 @@ public class HotelService {
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new RuntimeException("Hotel not found with id: " + hotelId));
         hotelRepository.delete(hotel);
+    }
+
+    public List<HotelResponse> getHotelsByOwner(String ownerId) {
+        return hotelRepository.findByCreatedBy_Id(ownerId)
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 
     private HotelResponse mapToResponse(Hotel hotel) {

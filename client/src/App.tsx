@@ -16,6 +16,9 @@ import ManageEvents from './pages/admin/ManageEvents';
 import ManageDestinations from './pages/admin/ManageDestinations';
 import ManageUsers from './pages/admin/ManageUsers';
 import Hotels from './pages/hotels/Hotels';
+import HotelRegistration from './pages/hotels/HotelRegistration'; // Import the new component
+import PaymentPage from './pages/PaymentPage'; // Create this component next
+          
 
 function App() {
   return (
@@ -72,6 +75,22 @@ function App() {
             element={
               <Layout>
                 <Hotels />
+              </Layout>
+            }
+          />
+          <Route
+            path="/hotels/register"
+            element={
+              <Layout>
+                <HotelRegistration />
+              </Layout>
+            }
+          />
+          <Route
+            path="/hotels/payment"
+            element={
+              <Layout>
+                <PaymentPage />
               </Layout>
             }
           />

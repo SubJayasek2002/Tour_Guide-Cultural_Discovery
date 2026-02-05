@@ -12,4 +12,6 @@ public interface HotelRepository extends MongoRepository<Hotel, String> {
     List<Hotel> findByIsPaidTrue();
 
     List<Hotel> findByIsPaidTrueAndCoordinatesNear(Point point, Distance distance);
+
+    List<Hotel> findByCreatedBy_Id(String ownerId);
 }

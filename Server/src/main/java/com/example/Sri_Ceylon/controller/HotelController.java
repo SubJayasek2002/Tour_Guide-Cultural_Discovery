@@ -67,4 +67,17 @@ public class HotelController {
         hotelService.deleteHotel(hotelId);
         return ResponseEntity.ok(new MessageResponse("Hotel deleted successfully!"));
     }
+
+    // Set isPaid true for a hotel (for payment success callback)
+    @PatchMapping("/{hotelId}/set-paid")
+    public ResponseEntity<MessageResponse> setHotelPaid(@PathVariable String hotelId) {
+        hotelService.setHotelPaid(hotelId);
+        return ResponseEntity.ok(new MessageResponse("Hotel marked as paid."));
+    }
+
+    @GetMapping("/owner/{ownerId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<HotelResponse>> getHotelsByOwner(@PathVariable String ownerId) {
+        return ResponseEntity.ok(hotelService.getHotelsByOwner(ownerId));
+    }
 }

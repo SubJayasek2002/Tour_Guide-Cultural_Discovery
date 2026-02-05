@@ -139,6 +139,11 @@ export const hotelsAPI = {
   getNearby: (lat: number, lng: number, radiusKm = 10) =>
     apiRequest(`/hotels/near?lat=${lat}&lng=${lng}&radiusKm=${radiusKm}`),
 
+  getByOwner: (ownerId: string) =>
+    apiRequest(`/hotels/owner/${ownerId}`, {
+      headers: getAuthHeaders(),
+    }),
+
   create: (hotelData: {
     name: string;
     description: string;
@@ -184,6 +189,10 @@ export const hotelsAPI = {
       headers: getAuthHeaders(),
     }),
 };
+
+// For MyHotels page convenience
+export const getHotelsByOwner = hotelsAPI.getByOwner;
+export const deleteHotel = hotelsAPI.delete;
 
 // Destinations API
 export const destinationsAPI = {

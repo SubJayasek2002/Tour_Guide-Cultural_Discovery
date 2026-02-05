@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { hotelsAPI } from '@/services/api';
 import type { Hotel } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -6,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { MapPin, Phone, Globe, Building, RefreshCw, Layers } from 'lucide-react';
+import { MapPin, Phone, Globe, Building, RefreshCw, Layers, Plus } from 'lucide-react';
 import { MapContainer, Marker, Popup, TileLayer, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -92,6 +93,12 @@ export default function Hotels() {
           <p className="text-gray-600 mt-1">Search hotels by map radius. Payment flow coming soon.</p>
         </div>
         <div className="flex flex-wrap gap-3 items-center">
+          <Button asChild className="bg-orange-600 hover:bg-orange-700">
+            <Link to="/hotels/register">
+              <Plus className="h-4 w-4 mr-2" />
+              Register Your Hotel
+            </Link>
+          </Button>
           <div className="flex gap-2 border rounded-lg p-1 bg-white">
             <Button
               variant={viewMode === 'map' ? 'default' : 'outline'}
