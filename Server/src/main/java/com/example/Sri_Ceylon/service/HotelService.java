@@ -93,6 +93,12 @@ public class HotelService {
                 .collect(Collectors.toList());
     }
 
+    public List<HotelResponse> getAllHotelsForAdmin() {
+        return hotelRepository.findAll().stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
     public HotelResponse getHotelById(String hotelId) {
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new RuntimeException("Hotel not found with id: " + hotelId));

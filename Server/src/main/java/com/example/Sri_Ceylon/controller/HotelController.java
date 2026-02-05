@@ -42,7 +42,13 @@ public class HotelController {
         return ResponseEntity.ok(hotelService.getNearbyHotels(lat, lng, radiusKm));
     }
 
-    // Admin endpoints (payment flow to be added later)
+    // Admin endpoints
+    @GetMapping("/admin/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<HotelResponse>> getAllHotelsForAdmin() {
+        return ResponseEntity.ok(hotelService.getAllHotelsForAdmin());
+    }
+
     @PostMapping
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<HotelResponse> createHotel(

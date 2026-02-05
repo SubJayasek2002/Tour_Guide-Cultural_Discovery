@@ -15,6 +15,7 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import ManageEvents from './pages/admin/ManageEvents';
 import ManageDestinations from './pages/admin/ManageDestinations';
 import ManageUsers from './pages/admin/ManageUsers';
+import ManageHotels from './pages/admin/ManageHotels';
 import Hotels from './pages/hotels/Hotels';
 import HotelRegistration from './pages/hotels/HotelRegistration'; // Import the new component
 import PaymentPage from './pages/PaymentPage'; // Create this component next
@@ -132,6 +133,16 @@ function App() {
               <ProtectedRoute adminOnly>
                 <Layout>
                   <ManageUsers />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/hotels"
+            element={
+              <ProtectedRoute adminOnly>
+                <Layout>
+                  <ManageHotels />
                 </Layout>
               </ProtectedRoute>
             }

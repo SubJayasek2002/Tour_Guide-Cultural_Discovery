@@ -134,6 +134,11 @@ export const eventsAPI = {
 export const hotelsAPI = {
   getAll: () => apiRequest('/hotels'),
 
+  getAllForAdmin: () =>
+    apiRequest('/hotels/admin/all', {
+      headers: getAuthHeaders(),
+    }),
+
   getById: (id: string) => apiRequest(`/hotels/${id}`),
 
   getNearby: (lat: number, lng: number, radiusKm = 10) =>
@@ -186,6 +191,12 @@ export const hotelsAPI = {
   delete: (id: string) =>
     apiRequest(`/hotels/${id}`, {
       method: 'DELETE',
+      headers: getAuthHeaders(),
+    }),
+
+  setPaid: (id: string) =>
+    apiRequest(`/hotels/${id}/set-paid`, {
+      method: 'PATCH',
       headers: getAuthHeaders(),
     }),
 };
