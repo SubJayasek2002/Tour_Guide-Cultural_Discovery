@@ -34,6 +34,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Search, Plus, Edit, Trash2, Building, X, CheckCircle, XCircle } from 'lucide-react';
 import MapPicker from '@/components/shared/MapPicker';
+import Footer from '@/components/shared/Footer';
 
 export default function ManageHotels() {
   const [hotels, setHotels] = useState<Hotel[]>([]);
@@ -228,27 +229,34 @@ export default function ManageHotels() {
   });
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Manage Hotels</h1>
-          <p className="text-gray-600 mt-1">Create and manage hotel listings</p>
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-white via-emerald-50/20 to-white">
+      <div className="flex-1 container mx-auto px-4 py-12">
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center space-x-3">
+            <div className="p-2 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 shadow-md">
+              <Building className="h-7 w-7 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-700 to-teal-600 bg-clip-text text-transparent">Manage Hotels</h1>
+              <p className="text-gray-600 mt-1">Create and manage hotel listings</p>
+            </div>
+          </div>
+          <Button onClick={() => handleOpenForm()} className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Hotel
+          </Button>
         </div>
-        <Button onClick={() => handleOpenForm()}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Hotel
-        </Button>
-      </div>
 
-      <div className="mb-8 max-w-2xl">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-          <Input
-            placeholder="Search hotels by name, description, address, or email..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 py-6 text-base"
-          />
+        <div className="mb-8 max-w-2xl">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-emerald-400" />
+            <Input
+              placeholder="Search hotels by name, description, address, or email..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 py-6 text-base border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500"
+            />
+          
         </div>
       </div>
 
@@ -256,117 +264,121 @@ export default function ManageHotels() {
       {filteredHotels.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
-            <Building className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+            <Building className="h-16 w-16 text-emerald-300 mx-auto mb-4" />
             <p className="text-gray-500">
               {searchQuery ? 'No hotels match your search.' : 'No hotels yet. Create your first hotel!'}
             </p>
           </CardContent>
         </Card>
       ) : (
-        <div className="border rounded-lg overflow-hidden bg-white">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Address</TableHead>
-                <TableHead>Contact</TableHead>
-                <TableHead>Amenities</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead className="text-center">Paid Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredHotels.map((hotel) => (
-                <TableRow key={hotel.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      {hotel.imageUrls && hotel.imageUrls.length > 0 ? (
-                        <img
-                          src={hotel.imageUrls[0]}
-                          alt={hotel.name}
-                          className="w-12 h-12 rounded object-cover"
-                        />
-                      ) : (
-                        <div className="w-12 h-12 rounded bg-orange-100 flex items-center justify-center">
-                          <Building className="h-6 w-6 text-orange-600" />
-                        </div>
-                      )}
-                      <div className="min-w-0 flex-1">
-                        <div className="font-semibold truncate">{hotel.name}</div>
-                        <div className="text-sm text-gray-500 truncate">{hotel.description}</div>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-sm max-w-xs truncate">{hotel.address}</div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="space-y-1 text-sm max-w-xs">
-                      {hotel.phones && hotel.phones.length > 0 && (
-                        <div className="text-gray-700">{hotel.phones[0]}</div>
-                      )}
-                      {hotel.email && <div className="text-gray-500 truncate">{hotel.email}</div>}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-wrap gap-1 max-w-xs">
-                      {hotel.amenities?.slice(0, 3).map((amenity) => (
-                        <Badge key={amenity} variant="secondary" className="text-xs">
-                          {amenity}
-                        </Badge>
-                      ))}
-                      {hotel.amenities && hotel.amenities.length > 3 && (
-                        <Badge variant="secondary" className="text-xs">
-                          +{hotel.amenities.length - 3}
-                        </Badge>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-sm text-gray-600">
-                      {new Date(hotel.createdAt).toLocaleDateString()}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setPaidToggleHotel(hotel)}
-                      className={hotel.isPaid ? 'text-green-600 hover:text-green-700' : 'text-red-600 hover:text-red-700'}
-                    >
-                      {hotel.isPaid ? (
-                        <CheckCircle className="h-5 w-5" />
-                      ) : (
-                        <XCircle className="h-5 w-5" />
-                      )}
-                    </Button>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex gap-2 justify-end">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleOpenForm(hotel)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setDeleteHotelId(hotel.id)}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
+        <div className="border-2 border-emerald-100 rounded-lg overflow-hidden bg-white shadow-lg">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-gradient-to-r from-emerald-50 to-teal-50 hover:from-emerald-50 hover:to-teal-50">
+                  <TableHead className="w-80 font-semibold text-emerald-900">Name</TableHead>
+                  <TableHead className="w-64 font-semibold text-emerald-900">Address</TableHead>
+                  <TableHead className="w-48 font-semibold text-emerald-900">Contact</TableHead>
+                  <TableHead className="w-40 font-semibold text-emerald-900">Amenities</TableHead>
+                  <TableHead className="w-32 font-semibold text-emerald-900">Created</TableHead>
+                  <TableHead className="w-28 text-center font-semibold text-emerald-900">Paid Status</TableHead>
+                  <TableHead className="w-40 text-right font-semibold text-emerald-900">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filteredHotels.map((hotel) => (
+                  <TableRow key={hotel.id} className="hover:bg-emerald-50/50 transition-colors">
+                    <TableCell className="w-80">
+                      <div className="flex items-center gap-3">
+                        {hotel.imageUrls && hotel.imageUrls.length > 0 ? (
+                          <img
+                            src={hotel.imageUrls[0]}
+                            alt={hotel.name}
+                            className="w-14 h-14 rounded-lg object-cover shadow-sm flex-shrink-0"
+                          />
+                        ) : (
+                          <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-emerald-100 to-teal-100 flex items-center justify-center flex-shrink-0">
+                            <Building className="h-7 w-7 text-emerald-600" />
+                          </div>
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <div className="font-semibold text-gray-900 truncate max-w-[220px]" title={hotel.name}>{hotel.name}</div>
+                          <div className="text-sm text-gray-500 truncate max-w-[220px]" title={hotel.description}>{hotel.description}</div>
+                        </div>
+                      </div>
+                      </TableCell>
+                    <TableCell className="w-64">
+                      <div className="text-sm max-w-[240px] truncate" title={hotel.address}>{hotel.address}</div>
+                    </TableCell>
+                    <TableCell className="w-48">
+                      <div className="space-y-1 text-sm max-w-[180px]">
+                        {hotel.phones && hotel.phones.length > 0 && (
+                          <div className="text-gray-700 font-medium">{hotel.phones[0]}</div>
+                        )}
+                        {hotel.email && <div className="text-gray-500 truncate" title={hotel.email}>{hotel.email}</div>}
+                      </div>
+                    </TableCell>
+                    <TableCell className="w-40">
+                      <div className="flex flex-wrap gap-1 max-w-[150px]">
+                        {hotel.amenities?.slice(0, 2).map((amenity) => (
+                          <Badge key={amenity} variant="secondary" className="text-xs bg-emerald-100 text-emerald-700">
+                            {amenity}
+                          </Badge>
+                        ))}
+                        {hotel.amenities && hotel.amenities.length > 2 && (
+                          <Badge variant="secondary" className="text-xs bg-teal-100 text-teal-700">
+                            +{hotel.amenities.length - 2}
+                          </Badge>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="w-32">
+                      <div className="text-sm text-gray-600 font-medium">
+                        {new Date(hotel.createdAt).toLocaleDateString()}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-center w-28">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setPaidToggleHotel(hotel)}
+                        className={hotel.isPaid ? 'text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50' : 'text-red-600 hover:text-red-700 hover:bg-red-50'}
+                      >
+                        {hotel.isPaid ? (
+                          <CheckCircle className="h-6 w-6" />
+                        ) : (
+                          <XCircle className="h-6 w-6" />
+                        )}
+                      </Button>
+                    </TableCell>
+                    <TableCell className="text-right w-40">
+                      <div className="flex gap-2 justify-end">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleOpenForm(hotel)}
+                          className="border-emerald-300 text-emerald-700 hover:bg-emerald-50"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setDeleteHotelId(hotel.id)}
+                          className="border-red-300 text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </div>
       )}
+                      
 
       {/* Form Dialog */}
       <Dialog open={showForm} onOpenChange={handleCloseForm}>
@@ -612,6 +624,8 @@ export default function ManageHotels() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      </div>
+      <Footer />
     </div>
   );
 }

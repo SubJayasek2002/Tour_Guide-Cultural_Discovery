@@ -11,6 +11,8 @@ import ReviewCard from '@/components/reviews/ReviewCard';
 import ReviewForm from '@/components/reviews/ReviewForm';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
+import Footer from '@/components/shared/Footer';
+import AutoScrollCarousel from '@/components/shared/AutoScrollCarousel';
 
 export default function EventDetail() {
   const { id } = useParams<{ id: string }>();
@@ -111,32 +113,22 @@ export default function EventDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Image Section */}
-      <div className="relative h-[60vh] bg-gray-900">
-        {event.imageUrls && event.imageUrls.length > 0 ? (
-          <>
-            <img
-              src={event.imageUrls[0]}
-              alt={event.title}
-              className="w-full h-full object-cover opacity-80"
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-white via-teal-50/20 to-white">
+      <div className="flex-1">
+        {/* Hero Image Section */}
+        <div className="relative h-[60vh] bg-gradient-to-br from-teal-900 to-cyan-900">
+          {event.imageUrls && event.imageUrls.length > 0 ? (
+            <AutoScrollCarousel 
+              images={event.imageUrls}
+              className="h-full w-full"
+              aspectRatio="h-full"
+              autoScrollInterval={6000}
             />
-            {event.imageUrls.length > 1 && (
-              <Button
-                variant="secondary"
-                className="absolute bottom-6 right-6"
-                onClick={() => setShowImageSlider(true)}
-              >
-                <ImageIcon className="h-4 w-4 mr-2" />
-                View All {event.imageUrls.length} Photos
-              </Button>
-            )}
-          </>
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-900 to-red-900">
-            <Calendar className="h-32 w-32 text-white/20" />
-          </div>
-        )}
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-teal-900 to-cyan-900">
+              <Calendar className="h-32 w-32 text-white/20" />
+            </div>
+          )}
 
         {/* Back Button */}
         <Button
@@ -165,7 +157,7 @@ export default function EventDetail() {
                       key={i}
                       className={`h-5 w-5 ${
                         i < Math.round(averageRating)
-                          ? 'fill-orange-500 text-orange-500'
+                          ? 'fill-teal-500 text-teal-500'
                           : 'text-gray-300'
                       }`}
                     />
@@ -182,7 +174,7 @@ export default function EventDetail() {
             <div className="space-y-3 text-gray-600">
               {event.start && (
                 <div className="flex items-start space-x-3">
-                  <Calendar className="h-5 w-5 text-orange-500 mt-0.5 flex-shrink-0" />
+                  <Calendar className="h-5 w-5 text-teal-600 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="font-medium text-gray-900">{formatDate(event.start)}</p>
                     {event.end && (
@@ -197,7 +189,7 @@ export default function EventDetail() {
               {event.location && (
                 <div className="flex items-start space-x-3 justify-between">
                   <div className="flex items-start space-x-3">
-                    <MapPin className="h-5 w-5 text-orange-500 mt-0.5 shrink-0" />
+                    <MapPin className="h-5 w-5 text-cyan-600 mt-0.5 shrink-0" />
                     <p>{event.location}</p>
                   </div>
                   {(event.latitude || event.longitude) && (
@@ -291,15 +283,17 @@ export default function EventDetail() {
         />
       )}
 
-      {/* Location Map Popup */}
-      <LocationMapPopup
-        isOpen={showLocationMap}
-        onClose={() => setShowLocationMap(false)}
-        latitude={event.latitude}
-        longitude={event.longitude}
-        title={event.title}
-        location={event.location}
-      />
+        {/* Location Map Popup */}
+        <LocationMapPopup
+          isOpen={showLocationMap}
+          onClose={() => setShowLocationMap(false)}
+          latitude={event.latitude}
+          longitude={event.longitude}
+          title={event.title}
+          location={event.location}
+        />
+      </div>
+      <Footer />
     </div>
   );
 }

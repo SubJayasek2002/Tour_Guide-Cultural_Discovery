@@ -13,6 +13,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { MapContainer, Marker, Popup, TileLayer, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import Footer from '@/components/shared/Footer';
+import AutoScrollCarousel from '@/components/shared/AutoScrollCarousel';
 
 // Fix default marker icons
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -159,22 +161,23 @@ export default function Events() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      {/* Hero Section */}
-      <div className="mb-12 text-center">
-        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-4">
-          Cultural Events
-        </h1>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          Discover and experience the vibrant cultural heritage of Sri Lanka through festivals,
-          ceremonies, and celebrations
-        </p>
-      </div>
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-white via-teal-50/20 to-white">
+      <div className="flex-1 container mx-auto px-4 py-12">
+        {/* Hero Section */}
+        <div className="mb-12 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-teal-700 to-cyan-600 bg-clip-text text-transparent mb-4">
+            Cultural Events
+          </h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Discover and experience the vibrant cultural heritage of Sri Lanka through festivals,
+            ceremonies, and celebrations
+          </p>
+        </div>
 
-      {/* Search Bar */}
-      <div className="mb-8 max-w-2xl mx-auto flex gap-3 items-center">
-        <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+        {/* Search Bar */}
+        <div className="mb-8 max-w-2xl mx-auto flex gap-3 items-center">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-teal-400" />
           <Input
             type="text"
             placeholder="Search events by title or description..."
@@ -237,7 +240,7 @@ export default function Events() {
                   Close
                 </Button>
                 <Button
-                  className="bg-orange-600 hover:bg-orange-700"
+                  className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white"
                   disabled={searchLat === null || searchLng === null}
                   onClick={() => {
                     if (searchLat !== null && searchLng !== null) {
@@ -251,21 +254,21 @@ export default function Events() {
             </div>
           </DialogContent>
         </Dialog>
-        {(searchQuery || hasLocationFilter) && (
-          <Button
-            variant="outline"
-            onClick={handleClearFilters}
-            className="text-gray-600 hover:text-gray-900"
-          >
-            <X className="h-4 w-4 mr-2" /> Clear Filters
-          </Button>
-        )}
-      </div>
+          {(searchQuery || hasLocationFilter) && (
+            <Button
+              variant="outline"
+              onClick={handleClearFilters}
+              className="text-gray-600 hover:text-gray-900 border-gray-300"
+            >
+              <X className="h-4 w-4 mr-2" /> Clear Filters
+            </Button>
+          )}
+        </div>
 
-      {/* Events Grid */}
-      {filteredEvents.length === 0 ? (
-        <div className="text-center py-12">
-          <Calendar className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+        {/* Events Grid */}
+        {filteredEvents.length === 0 ? (
+          <div className="text-center py-12">
+            <Calendar className="h-16 w-16 text-teal-300 mx-auto mb-4" />
           <p className="text-gray-500 text-lg">
             {searchQuery ? 'No events found matching your search' : 'No events available at the moment'}
           </p>
@@ -274,65 +277,68 @@ export default function Events() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredEvents.map((event) => (
             <Link key={event.id} to={`/events/${event.id}`}>
-              <Card className="group h-full overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                {/* Image */}
-                <div className="relative h-56 overflow-hidden bg-gray-200">
+                <Card className="group h-full overflow-hidden hover:shadow-2xl transition-all duration-300 border-teal-100 hover:border-teal-300 hover:-translate-y-1">
+                  {/* Image Carousel */}
                   {event.imageUrls && event.imageUrls.length > 0 ? (
-                    <img
-                      src={event.imageUrls[0]}
-                      alt={event.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
+                    <>
+                      <AutoScrollCarousel 
+                        images={event.imageUrls} 
+                        className="h-56"
+                        aspectRatio="h-56"
+                      />
+                      {event.start && (
+                        <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm rounded-lg px-3 py-2 shadow-lg z-10">
+                          <p className="text-xs text-gray-700 font-semibold">
+                            {formatDate(event.start)}
+                          </p>
+                        </div>
+                      )}
+                    </>
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-100 to-red-100">
-                      <Calendar className="h-16 w-16 text-orange-300" />
+                    <div className="h-56 flex items-center justify-center bg-gradient-to-br from-teal-100 to-cyan-100">
+                      <Calendar className="h-16 w-16 text-teal-300" />
                     </div>
                   )}
-                  {event.start && (
-                    <div className="absolute top-4 right-4 bg-white rounded-lg px-3 py-2 shadow-lg">
-                      <p className="text-xs text-gray-600 font-medium">
-                        {formatDate(event.start)}
-                      </p>
+
+                  <CardContent className="p-6">
+                    <h3 className="text-xl font-bold mb-2 group-hover:text-teal-700 transition-colors line-clamp-2">
+                      {event.title}
+                    </h3>
+
+                    <p className="text-gray-600 text-sm mb-4 line-clamp-3">{event.description}</p>
+
+                    <div className="space-y-2">
+                      {event.location && (
+                        <div className="flex items-center text-sm text-gray-500">
+                          <MapPin className="h-4 w-4 mr-2 text-teal-600" />
+                          <span className="line-clamp-1">{event.location}</span>
+                        </div>
+                      )}
+
+                      {event.start && event.end && (
+                        <div className="flex items-center text-sm text-gray-500">
+                          <Clock className="h-4 w-4 mr-2 text-cyan-600" />
+                          <span>
+                            {formatTime(event.start)} - {formatTime(event.end)}
+                          </span>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
 
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold mb-2 group-hover:text-orange-600 transition-colors line-clamp-2">
-                    {event.title}
-                  </h3>
-
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-3">{event.description}</p>
-
-                  <div className="space-y-2">
-                    {event.location && (
-                      <div className="flex items-center text-sm text-gray-500">
-                        <MapPin className="h-4 w-4 mr-2 text-orange-500" />
-                        <span className="line-clamp-1">{event.location}</span>
-                      </div>
-                    )}
-
-                    {event.start && event.end && (
-                      <div className="flex items-center text-sm text-gray-500">
-                        <Clock className="h-4 w-4 mr-2 text-orange-500" />
-                        <span>
-                          {formatTime(event.start)} - {formatTime(event.end)}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  {event.imageUrls && event.imageUrls.length > 1 && (
-                    <Badge variant="secondary" className="mt-4">
-                      {event.imageUrls.length} photos
+                    <Badge 
+                      variant="secondary" 
+                      className="mt-4 bg-gradient-to-r from-teal-100 to-cyan-100 text-teal-700"
+                    >
+                      View Event
                     </Badge>
-                  )}
-                </CardContent>
+                  </CardContent>
               </Card>
             </Link>
           ))}
         </div>
       )}
+      </div>
+      <Footer />
     </div>
   );
 }

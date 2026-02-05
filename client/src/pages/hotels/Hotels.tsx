@@ -11,6 +11,8 @@ import { AlignLeft, MapPin, Phone, Globe, Building, RefreshCw, Layers, Plus, X }
 import { MapContainer, Marker, Popup, TileLayer, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import Footer from '@/components/shared/Footer';
+import AutoScrollCarousel from '@/components/shared/AutoScrollCarousel';
 
 // Fix default marker icons
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -127,19 +129,20 @@ export default function Hotels() {
   );
 
   return (
-    <div className="container mx-auto px-4 py-10">
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Find Hotels Nearby</h1>
-          <p className="text-gray-600 mt-1">Search hotels by map radius. Payment flow coming soon.</p>
-        </div>
-        <div className="flex flex-wrap gap-3 items-center">
-          <Button asChild className="bg-orange-600 hover:bg-orange-700">
-            <Link to="/hotels/register">
-              <Plus className="h-4 w-4 mr-2" />
-              Register Your Hotel
-            </Link>
-          </Button>
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-white via-cyan-50/20 to-white">
+      <div className="flex-1 container mx-auto px-4 py-10">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-700 to-blue-600 bg-clip-text text-transparent">Find Hotels Nearby</h1>
+            <p className="text-gray-600 mt-1">Search hotels by map radius. Discover the perfect stay for your journey.</p>
+          </div>
+          <div className="flex flex-wrap gap-3 items-center">
+            <Button asChild className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700">
+              <Link to="/hotels/register">
+                <Plus className="h-4 w-4 mr-2" />
+                Register Your Hotel
+              </Link>
+            </Button>
           <div className="flex gap-2 border rounded-lg p-1 bg-white">
             <Button
               variant={viewMode === 'map' ? 'default' : 'outline'}
@@ -162,12 +165,12 @@ export default function Hotels() {
       {/* Search Bar */}
       <div className="mb-8 flex gap-3 items-center">
         <div className="flex-1 max-w-2xl relative">
-          <AlignLeft className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <AlignLeft className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-cyan-400" />
           <Input
             placeholder="Search by hotel name or location..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 py-6 text-base"
+            className="pl-10 py-6 text-base border-cyan-200 focus:border-cyan-500 focus:ring-cyan-500"
           />
         </div>
         <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
@@ -226,7 +229,7 @@ export default function Hotels() {
                     Close
                   </Button>
                   <Button
-                    className="bg-orange-600 hover:bg-orange-700"
+                    className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white"
                     disabled={loading || searchLat === null || searchLng === null}
                     onClick={() => {
                       if (searchLat !== null && searchLng !== null) {
@@ -288,13 +291,15 @@ export default function Hotels() {
 
           <div className="grid gap-4 md:grid-cols-2">
             {filteredHotels.map((hotel) => (
-              <Card key={hotel.id} className="border shadow-sm">
+              <Card key={hotel.id} className="border border-cyan-100 shadow-sm hover:shadow-lg hover:border-cyan-300 transition-all">
                 {hotel.imageUrls && hotel.imageUrls.length > 0 ? (
-                  <div className="h-40 w-full overflow-hidden">
-                    <img src={hotel.imageUrls[0]} alt={hotel.name} className="w-full h-full object-cover" />
-                  </div>
+                  <AutoScrollCarousel 
+                    images={hotel.imageUrls} 
+                    className="h-40"
+                    aspectRatio="h-40"
+                  />
                 ) : (
-                  <div className="h-40 w-full flex items-center justify-center bg-orange-50 text-orange-600">
+                  <div className="h-40 w-full flex items-center justify-center bg-gradient-to-br from-cyan-100 to-blue-100 text-cyan-600">
                     <Building className="h-10 w-10" />
                   </div>
                 )}
@@ -311,7 +316,7 @@ export default function Hotels() {
                     )}
                   </div>
                   <p className="text-sm text-gray-700 flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-orange-500" /> {hotel.address}
+                    <MapPin className="h-4 w-4 text-cyan-600" /> {hotel.address}
                   </p>
                   <div className="flex flex-wrap gap-2 pt-2 border-t">
                     {hotel.phones?.map((p) => (
@@ -352,7 +357,7 @@ export default function Hotels() {
                   {hotel.website && (
                     <Button
                       asChild
-                      className="w-full mt-2 bg-orange-600 hover:bg-orange-700"
+                      className="w-full mt-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700"
                     >
                       <a href={hotel.website} target="_blank" rel="noreferrer">
                         <Globe className="h-4 w-4 mr-2" /> Visit Website
@@ -372,13 +377,15 @@ export default function Hotels() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {filteredHotels.map((hotel) => (
-            <Card key={hotel.id} className="border shadow-sm flex flex-col h-full">
+            <Card key={hotel.id} className="border border-cyan-100 shadow-sm flex flex-col h-full hover:shadow-lg hover:border-cyan-300 transition-all">
               {hotel.imageUrls && hotel.imageUrls.length > 0 ? (
-                <div className="h-48 w-full overflow-hidden">
-                  <img src={hotel.imageUrls[0]} alt={hotel.name} className="w-full h-full object-cover" />
-                </div>
+                <AutoScrollCarousel 
+                  images={hotel.imageUrls} 
+                  className="h-48"
+                  aspectRatio="h-48"
+                />
               ) : (
-                <div className="h-48 w-full flex items-center justify-center bg-orange-50 text-orange-600">
+                <div className="h-48 w-full flex items-center justify-center bg-gradient-to-br from-cyan-100 to-blue-100 text-cyan-600">
                   <Building className="h-12 w-12" />
                 </div>
               )}
@@ -395,7 +402,7 @@ export default function Hotels() {
                   )}
                 </div>
                 <p className="text-sm text-gray-700 flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-orange-500 shrink-0" /> {hotel.address}
+                  <MapPin className="h-4 w-4 text-cyan-600 shrink-0" /> {hotel.address}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {hotel.amenities?.slice(0, 3).map((a) => (
@@ -436,7 +443,7 @@ export default function Hotels() {
                 {hotel.website && (
                   <Button
                     asChild
-                    className="w-full mt-2 bg-orange-600 hover:bg-orange-700"
+                    className="w-full mt-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700"
                   >
                     <a href={hotel.website} target="_blank" rel="noreferrer">
                       <Globe className="h-4 w-4 mr-2" /> Visit Website
@@ -453,6 +460,8 @@ export default function Hotels() {
           )}
         </div>
       )}
+      </div>
+      <Footer />
     </div>
   );
 }
