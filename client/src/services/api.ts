@@ -130,6 +130,81 @@ export const eventsAPI = {
     }),
 };
 
+// Hotels API
+export const hotelsAPI = {
+  getAll: () => apiRequest('/hotels'),
+
+  getAllForAdmin: () =>
+    apiRequest('/hotels/admin/all', {
+      headers: getAuthHeaders(),
+    }),
+
+  getById: (id: string) => apiRequest(`/hotels/${id}`),
+
+  getNearby: (lat: number, lng: number, radiusKm = 10) =>
+    apiRequest(`/hotels/near?lat=${lat}&lng=${lng}&radiusKm=${radiusKm}`),
+
+  getByOwner: (ownerId: string) =>
+    apiRequest(`/hotels/owner/${ownerId}`, {
+      headers: getAuthHeaders(),
+    }),
+
+  create: (hotelData: {
+    name: string;
+    description: string;
+    address: string;
+    phones?: string[];
+    whatsapp?: string;
+    email?: string;
+    website?: string;
+    amenities?: string[];
+    imageUrls?: string[];
+    latitude: number;
+    longitude: number;
+  }) =>
+    apiRequest('/hotels', {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(hotelData),
+    }),
+
+  update: (id: string, hotelData: Partial<{
+    name: string;
+    description: string;
+    address: string;
+    phones?: string[];
+    whatsapp?: string;
+    email?: string;
+    website?: string;
+    amenities?: string[];
+    imageUrls?: string[];
+    latitude?: number;
+    longitude?: number;
+    isPaid?: boolean;
+  }>) =>
+    apiRequest(`/hotels/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(hotelData),
+    }),
+
+  delete: (id: string) =>
+    apiRequest(`/hotels/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    }),
+
+  setPaid: (id: string) =>
+    apiRequest(`/hotels/${id}/set-paid`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+    }),
+};
+
+// For MyHotels page convenience
+export const getHotelsByOwner = hotelsAPI.getByOwner;
+export const deleteHotel = hotelsAPI.delete;
+
 // Destinations API
 export const destinationsAPI = {
   getAll: () => apiRequest('/destinations'),

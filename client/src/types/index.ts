@@ -53,3 +53,22 @@ export interface User {
   createdAt: string;
   lastLoginAt?: string;
 }
+
+export interface Hotel {
+  id: string;
+  name: string;
+  description: string;
+  address: string;
+  phones?: string[];
+  whatsapp?: string;
+  email?: string;
+  website?: string;
+  amenities?: string[];
+  imageUrls?: string[];
+  latitude?: number;
+  longitude?: number;
+  isPaid: boolean;
+  createdAt: string;
+  createdById?: string;
+  createdByUsername?: string;
+}

@@ -11,6 +11,8 @@ import ReviewCard from '@/components/reviews/ReviewCard';
 import ReviewForm from '@/components/reviews/ReviewForm';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
+import Footer from '@/components/shared/Footer';
+import AutoScrollCarousel from '@/components/shared/AutoScrollCarousel';
 
 export default function DestinationDetail() {
   const { id } = useParams<{ id: string }>();
@@ -91,32 +93,24 @@ export default function DestinationDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Image Section */}
-      <div className="relative h-[60vh] bg-gray-900">
-        {destination.imageUrls && destination.imageUrls.length > 0 ? (
-          <>
-            <img
-              src={destination.imageUrls[0]}
-              alt={destination.title}
-              className="w-full h-full object-cover opacity-80"
-            />
-            {destination.imageUrls.length > 1 && (
-              <Button
-                variant="secondary"
-                className="absolute bottom-6 right-6"
-                onClick={() => setShowImageSlider(true)}
-              >
-                <ImageIcon className="h-4 w-4 mr-2" />
-                View All {destination.imageUrls.length} Photos
-              </Button>
-            )}
-          </>
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-900 to-red-900">
-            <MapPin className="h-32 w-32 text-white/20" />
-          </div>
-        )}
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-white via-emerald-50/20 to-white">
+      <div className="flex-1">
+        {/* Hero Image Section */}
+        <div className="relative h-[60vh] bg-gradient-to-br from-emerald-900 to-teal-900">
+          {destination.imageUrls && destination.imageUrls.length > 0 ? (
+            <>
+              <AutoScrollCarousel 
+                images={destination.imageUrls}
+                className="h-full w-full"
+                aspectRatio="h-full"
+                autoScrollInterval={6000}
+              />
+            </>
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-emerald-900 to-teal-900">
+              <MapPin className="h-32 w-32 text-white/20" />
+            </div>
+          )}
 
         {/* Back Button */}
         <Button
@@ -145,7 +139,7 @@ export default function DestinationDetail() {
                       key={i}
                       className={`h-5 w-5 ${
                         i < Math.round(averageRating)
-                          ? 'fill-orange-500 text-orange-500'
+                          ? 'fill-emerald-500 text-emerald-500'
                           : 'text-gray-300'
                       }`}
                     />
@@ -163,7 +157,7 @@ export default function DestinationDetail() {
               {destination.location && (
                 <div className="flex items-start space-x-3 justify-between">
                   <div className="flex items-start space-x-3">
-                    <MapPin className="h-5 w-5 text-orange-500 mt-0.5 shrink-0" />
+                    <MapPin className="h-5 w-5 text-emerald-600 mt-0.5 shrink-0" />
                     <p className="font-medium">{destination.location}</p>
                   </div>
                   {(destination.latitude || destination.longitude) && (
@@ -180,7 +174,7 @@ export default function DestinationDetail() {
 
               {destination.bestSeasonToVisit && (
                 <div className="flex items-start space-x-3">
-                  <Sun className="h-5 w-5 text-orange-500 mt-0.5 flex-shrink-0" />
+                  <Sun className="h-5 w-5 text-teal-600 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="text-sm text-gray-500 font-medium">Best Time to Visit</p>
                     <p>{destination.bestSeasonToVisit}</p>
@@ -269,15 +263,17 @@ export default function DestinationDetail() {
         />
       )}
 
-      {/* Location Map Popup */}
-      <LocationMapPopup
-        isOpen={showLocationMap}
-        onClose={() => setShowLocationMap(false)}
-        latitude={destination.latitude}
-        longitude={destination.longitude}
-        title={destination.title}
-        location={destination.location}
-      />
+        {/* Location Map Popup */}
+        <LocationMapPopup
+          isOpen={showLocationMap}
+          onClose={() => setShowLocationMap(false)}
+          latitude={destination.latitude}
+          longitude={destination.longitude}
+          title={destination.title}
+          location={destination.location}
+        />
+      </div>
+      <Footer />
     </div>
   );
 }
