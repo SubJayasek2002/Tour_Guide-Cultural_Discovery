@@ -157,7 +157,7 @@ export default function Hotels() {
                     Close
                   </Button>
                   <Button
-                    className="bg-orange-600 hover:bg-orange-700"
+                    className="bg-teal-600 hover:bg-teal-700"
                     disabled={loading || searchLat === null || searchLng === null}
                     onClick={() => {
                       if (searchLat !== null && searchLng !== null) {
@@ -211,7 +211,7 @@ export default function Hotels() {
                     <img src={hotel.imageUrls[0]} alt={hotel.name} className="w-full h-full object-cover" />
                   </div>
                 ) : (
-                  <div className="h-40 w-full flex items-center justify-center bg-orange-50 text-orange-600">
+                  <div className="h-40 w-full flex items-center justify-center bg-teal-50 text-teal-600">
                     <Building className="h-10 w-10" />
                   </div>
                 )}
@@ -228,7 +228,7 @@ export default function Hotels() {
                     )}
                   </div>
                   <p className="text-sm text-gray-700 flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-orange-500" /> {hotel.address}
+                    <MapPin className="h-4 w-4 text-teal-600" /> {hotel.address}
                   </p>
                   <div className="flex flex-wrap gap-2 pt-2 border-t">
                     {hotel.phones?.map((p, idx) => (
@@ -269,7 +269,7 @@ export default function Hotels() {
                   {hotel.website && (
                     <Button
                       asChild
-                      className="w-full mt-2 bg-orange-600 hover:bg-orange-700"
+                      className="w-full mt-2 bg-white hover:bg-gray-100 text-teal-600 border border-teal-600"
                     >
                       <a href={hotel.website} target="_blank" rel="noreferrer">
                         <Globe className="h-4 w-4 mr-2" /> Visit Website
@@ -295,7 +295,7 @@ export default function Hotels() {
                   <img src={hotel.imageUrls[0]} alt={hotel.name} className="w-full h-full object-cover" />
                 </div>
               ) : (
-                <div className="h-48 w-full flex items-center justify-center bg-orange-50 text-orange-600">
+                <div className="h-48 w-full flex items-center justify-center bg-teal-50 text-teal-600">
                   <Building className="h-12 w-12" />
                 </div>
               )}
@@ -312,7 +312,7 @@ export default function Hotels() {
                   )}
                 </div>
                 <p className="text-sm text-gray-700 flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-orange-500 shrink-0" /> {hotel.address}
+                  <MapPin className="h-4 w-4 text-teal-600 shrink-0" /> {hotel.address}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {hotel.amenities?.slice(0, 3).map((a) => (
@@ -353,7 +353,7 @@ export default function Hotels() {
                 {hotel.website && (
                   <Button
                     asChild
-                    className="w-full mt-2 bg-orange-600 hover:bg-orange-700"
+                    className="w-full mt-2 bg-white hover:bg-gray-100 text-teal-600 border border-teal-600"
                   >
                     <a href={hotel.website} target="_blank" rel="noreferrer">
                       <Globe className="h-4 w-4 mr-2" /> Visit Website

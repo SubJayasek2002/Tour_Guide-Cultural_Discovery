@@ -25,10 +25,10 @@ export default function Header() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <div className="h-8 w-8 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
+            <div className="h-8 w-8 rounded-full bg-gradient-to-br from-teal-600 to-teal-700 flex items-center justify-center">
               <MapPin className="h-5 w-5 text-white" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+            <span className="text-xl font-bold bg-gradient-to-r from-teal-600 to-amber-500 bg-clip-text text-transparent">
               Taprobane
             </span>
           </Link>
@@ -37,21 +37,21 @@ export default function Header() {
           <nav className="hidden md:flex items-center space-x-6">
             <Link
               to="/destinations"
-              className="text-sm font-medium text-gray-700 hover:text-orange-600 transition-colors flex items-center space-x-1"
+              className="text-sm font-medium text-gray-700 hover:text-teal-600 transition-colors flex items-center space-x-1"
             >
               <MapPin className="h-4 w-4" />
               <span>Destinations</span>
             </Link>
             <Link
               to="/events"
-              className="text-sm font-medium text-gray-700 hover:text-orange-600 transition-colors flex items-center space-x-1"
+              className="text-sm font-medium text-gray-700 hover:text-teal-600 transition-colors flex items-center space-x-1"
             >
               <Calendar className="h-4 w-4" />
               <span>Events</span>
             </Link>
             <Link
               to="/hotels"
-              className="text-sm font-medium text-gray-700 hover:text-orange-600 transition-colors flex items-center space-x-1"
+              className="text-sm font-medium text-gray-700 hover:text-teal-600 transition-colors flex items-center space-x-1"
             >
               <Hotel className="h-4 w-4" />
               <span>Hotels</span>
@@ -59,7 +59,7 @@ export default function Header() {
             {isAdmin && (
               <Link
                 to="/admin"
-                className="text-sm font-medium text-orange-600 hover:text-orange-700 transition-colors flex items-center space-x-1"
+                className="text-sm font-medium text-teal-600 hover:text-teal-700 transition-colors flex items-center space-x-1"
               >
                 <Shield className="h-4 w-4" />
                 <span>Admin</span>
@@ -73,7 +73,7 @@ export default function Header() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="flex items-center space-x-2">
-                    <div className="h-8 w-8 rounded-full bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center">
+                    <div className="h-8 w-8 rounded-full bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center">
                       <User className="h-4 w-4 text-white" />
                     </div>
                     <span className="hidden md:inline text-sm font-medium">

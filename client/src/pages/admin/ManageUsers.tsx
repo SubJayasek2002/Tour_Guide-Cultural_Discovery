@@ -138,7 +138,7 @@ export default function ManageUsers() {
                 <p className="text-sm text-gray-600">Total Users</p>
                 <p className="text-2xl font-bold text-gray-900">{users.length}</p>
               </div>
-              <Users className="h-8 w-8 text-orange-600" />
+              <Users className="h-8 w-8 text-teal-600" />
             </div>
           </CardContent>
         </Card>
@@ -304,7 +304,7 @@ export default function ManageUsers() {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleToggleStatus}
-              className={getUserToToggle()?.enabled ? 'bg-orange-600 hover:bg-orange-700' : ''}
+              className={getUserToToggle()?.enabled ? 'bg-teal-600 hover:bg-teal-700' : ''}
             >
               {getUserToToggle()?.enabled ? 'Disable' : 'Enable'}
             </AlertDialogAction>

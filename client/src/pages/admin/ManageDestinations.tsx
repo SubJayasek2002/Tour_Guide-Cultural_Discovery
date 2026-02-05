@@ -195,8 +195,8 @@ export default function ManageDestinations() {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-100 to-red-100">
-                    <MapPin className="h-12 w-12 text-orange-300" />
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-teal-100 to-amber-100">
+                    <MapPin className="h-12 w-12 text-teal-300" />
                   </div>
                 )}
               </div>

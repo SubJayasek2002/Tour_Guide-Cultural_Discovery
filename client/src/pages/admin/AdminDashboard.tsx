@@ -7,7 +7,7 @@ export default function AdminDashboard() {
     <div className="container mx-auto px-4 py-12">
       <div className="mb-8">
         <div className="flex items-center space-x-3 mb-2">
-          <Shield className="h-8 w-8 text-orange-600" />
+          <Shield className="h-8 w-8 text-teal-600" />
           <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
         </div>
         <p className="text-gray-600">Manage events, destinations, and users</p>
@@ -19,9 +19,9 @@ export default function AdminDashboard() {
           <Card className="group hover:shadow-lg transition-shadow cursor-pointer">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <Calendar className="h-12 w-12 text-orange-600 group-hover:scale-110 transition-transform" />
+                <Calendar className="h-12 w-12 text-teal-600 group-hover:scale-110 transition-transform" />
               </div>
-              <CardTitle className="text-2xl group-hover:text-orange-600 transition-colors">
+              <CardTitle className="text-2xl group-hover:text-teal-600 transition-colors">
                 Manage Events
               </CardTitle>
               <CardDescription>
@@ -42,9 +42,9 @@ export default function AdminDashboard() {
           <Card className="group hover:shadow-lg transition-shadow cursor-pointer">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <MapPin className="h-12 w-12 text-orange-600 group-hover:scale-110 transition-transform" />
+                <MapPin className="h-12 w-12 text-teal-600 group-hover:scale-110 transition-transform" />
               </div>
-              <CardTitle className="text-2xl group-hover:text-orange-600 transition-colors">
+              <CardTitle className="text-2xl group-hover:text-teal-600 transition-colors">
                 Manage Destinations
               </CardTitle>
               <CardDescription>
@@ -65,9 +65,9 @@ export default function AdminDashboard() {
           <Card className="group hover:shadow-lg transition-shadow cursor-pointer">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <Users className="h-12 w-12 text-orange-600 group-hover:scale-110 transition-transform" />
+                <Users className="h-12 w-12 text-teal-600 group-hover:scale-110 transition-transform" />
               </div>
-              <CardTitle className="text-2xl group-hover:text-orange-600 transition-colors">
+              <CardTitle className="text-2xl group-hover:text-teal-600 transition-colors">
                 Manage Users
               </CardTitle>
               <CardDescription>

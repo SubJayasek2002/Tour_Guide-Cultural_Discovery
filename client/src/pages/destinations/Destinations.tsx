@@ -54,7 +54,7 @@ export default function Destinations() {
     <div className="container mx-auto px-4 py-12">
       {/* Hero Section */}
       <div className="mb-12 text-center">
-        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-4">
+        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-teal-600 to-amber-500 bg-clip-text text-transparent mb-4">
           Travel Destinations
         </h1>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -99,8 +99,8 @@ export default function Destinations() {
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-100 to-red-100">
-                      <MapPin className="h-16 w-16 text-orange-300" />
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-teal-100 to-amber-100">
+                      <MapPin className="h-16 w-16 text-teal-300" />
                     </div>
                   )}
                   {destination.imageUrls && destination.imageUrls.length > 1 && (
@@ -114,7 +114,7 @@ export default function Destinations() {
                 </div>
 
                 <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold mb-2 group-hover:text-orange-600 transition-colors line-clamp-2">
+                  <h3 className="text-xl font-semibold mb-2 group-hover:text-teal-600 transition-colors line-clamp-2">
                     {destination.title}
                   </h3>
 
@@ -125,14 +125,14 @@ export default function Destinations() {
                   <div className="space-y-2">
                     {destination.location && (
                       <div className="flex items-center text-sm text-gray-500">
-                        <MapPin className="h-4 w-4 mr-2 text-orange-500" />
+                        <MapPin className="h-4 w-4 mr-2 text-teal-600" />
                         <span className="line-clamp-1">{destination.location}</span>
                       </div>
                     )}
 
                     {destination.bestSeasonToVisit && (
                       <div className="flex items-start text-sm text-gray-500">
-                        <Sun className="h-4 w-4 mr-2 mt-0.5 text-orange-500 flex-shrink-0" />
+                        <Sun className="h-4 w-4 mr-2 mt-0.5 text-teal-600 flex-shrink-0" />
                         <span className="line-clamp-2">{destination.bestSeasonToVisit}</span>
                       </div>
                     )}
@@ -140,7 +140,7 @@ export default function Destinations() {
 
                   <Badge
                     variant="secondary"
-                    className="mt-4 bg-gradient-to-r from-orange-100 to-red-100 text-orange-700"
+                    className="mt-4 bg-gradient-to-r from-teal-100 to-amber-100 text-teal-700"
                   >
                     Explore
                   </Badge>
