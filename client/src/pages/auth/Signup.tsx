@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -59,6 +60,14 @@ export default function Signup() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 p-4">
       <Card className="w-full max-w-md">
+        <div className="flex items-start justify-between p-6 pb-0">
+          <Link to="/" className="-ml-2 -mt-2">
+            <Button size="icon" variant="ghost" className="text-teal-600 hover:bg-teal-50">
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+          </Link>
+          <div />
+        </div>
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">Join Taprobane</CardTitle>
           <CardDescription className="text-center">
@@ -174,7 +183,7 @@ export default function Signup() {
 
           <div className="mt-6 text-center text-sm">
             <span className="text-gray-600">Already have an account? </span>
-            <Link to="/login" className="text-orange-600 hover:text-orange-700 font-medium">
+            <Link to="/login" className="text-teal-600 hover:text-teal-700 font-medium">
               Sign in
             </Link>
           </div>
