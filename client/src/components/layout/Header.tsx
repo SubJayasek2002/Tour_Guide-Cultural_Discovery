@@ -29,7 +29,7 @@ export default function Header() {
               <MapPin className="h-5 w-5 text-white" />
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-              Thaprobane
+              Taprobane
             </span>
           </Link>
 
@@ -76,7 +76,7 @@ export default function Header() {
                     <div className="h-8 w-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-md">
                       <User className="h-4 w-4 text-white" />
                     </div>
-                    <span className="hidden md:inline text-sm font-medium text-gray-700">
+                    <span className="hidden md:inline text-sm font-medium text-gray-400">
                       {user.firstName || user.username}
                     </span>
                   </Button>
@@ -109,7 +109,7 @@ export default function Header() {
                 <Button variant="ghost" asChild className="hover:bg-emerald-50 hover:text-emerald-700">
                   <Link to="/login">Sign In</Link>
                 </Button>
-                <Button asChild className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-md hover:shadow-lg transition-all">
+                <Button asChild className="bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-700 hover:to-teal-700 text-white shadow-md hover:shadow-lg transition-all">
                   <Link to="/signup">Sign Up</Link>
                 </Button>
               </div>

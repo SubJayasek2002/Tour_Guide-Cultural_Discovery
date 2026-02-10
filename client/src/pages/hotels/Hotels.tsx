@@ -137,7 +137,7 @@ export default function Hotels() {
             <p className="text-gray-600 mt-1">Search hotels by map radius. Discover the perfect stay for your journey.</p>
           </div>
           <div className="flex flex-wrap gap-3 items-center">
-            <Button asChild className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700">
+            <Button asChild className="bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-cyan-400 hover:to-blue-700">
               <Link to="/hotels/register">
                 <Plus className="h-4 w-4 mr-2" />
                 Register Your Hotel
@@ -357,7 +357,7 @@ export default function Hotels() {
                   {hotel.website && (
                     <Button
                       asChild
-                      className="w-full mt-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700"
+                      className="w-full mt-2 bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-600 hover:to-teal-700 border-2 border-emerald-700 hover:border-emerald-800"
                     >
                       <a href={hotel.website} target="_blank" rel="noreferrer">
                         <Globe className="h-4 w-4 mr-2" /> Visit Website
@@ -443,7 +443,7 @@ export default function Hotels() {
                 {hotel.website && (
                   <Button
                     asChild
-                    className="w-full mt-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700"
+                    className="w-full mt-2 bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-600 hover:to-teal-700 border-2 border-emerald-700 hover:border-emerald-800"
                   >
                     <a href={hotel.website} target="_blank" rel="noreferrer">
                       <Globe className="h-4 w-4 mr-2" /> Visit Website

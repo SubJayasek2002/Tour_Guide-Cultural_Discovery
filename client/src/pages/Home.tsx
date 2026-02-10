@@ -14,10 +14,10 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Hero Section */}
-      <section className="relative h-[700px] bg-gradient-to-br from-emerald-600 via-teal-700 to-cyan-800 overflow-hidden">
+      <section className="relative h-[700px] overflow-hidden">
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2070')] bg-cover bg-center opacity-25 animate-ken-burns" />
-          <div className="absolute inset-0 bg-gradient-to-t from-emerald-900/60 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1705365291453-7962869cae67?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8c2lnaXJpeWElMjByb2NrfGVufDB8fDB8fHww')] bg-cover bg-center opacity-100 animate-ken-burns" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
         </div>
         
         <div className="relative container mx-auto px-4 h-full flex items-center">
@@ -36,7 +36,7 @@ export default function Home() {
               Journey through ancient temples, pristine beaches, lush tea plantations, and vibrant cultural festivals in the Pearl of the Indian Ocean
             </p>
             <div className="flex flex-wrap gap-4">
-              <Button asChild size="lg" className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg hover:shadow-xl transition-all">
+              <Button asChild size="lg" className="bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg hover:shadow-xl transition-all">
                 <Link to="/destinations">
                   <MapPin className="mr-2 h-5 w-5" />
                   Explore Destinations
@@ -235,7 +235,7 @@ export default function Home() {
               find hidden gems, and create unforgettable memories.
             </p>
             <div className="flex flex-wrap gap-6 justify-center">
-              <Button asChild size="lg" className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-lg hover:shadow-xl transition-all text-lg px-8">
+              <Button asChild size="lg" className="bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-700 hover:to-teal-700 text-white shadow-lg hover:shadow-xl transition-all text-lg px-8">
                 <Link to="/signup">
                   Get Started Free
                 </Link>
