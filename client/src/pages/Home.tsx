@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { MapPin, Calendar, Star, Shield, Mountain, Waves, TreePine, Compass, Building, Award } from 'lucide-react';
 import Footer from '@/components/shared/Footer';
+import Chat from '@/components/chat/Chat';
 
 export default function Home() {
   const heroImages = [
@@ -252,6 +253,10 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <div className="container mx-auto p-6">
+        <Chat />
+      </div>
 
       <Footer />
     </div>
