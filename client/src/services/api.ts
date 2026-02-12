@@ -316,30 +316,3 @@ export const destinationReviewsAPI = {
       headers: getAuthHeaders(),
     }),
 };
-
-// Chat API (backend at /api/chat/send)
-export const chatAPI = {
-  sendMessage: async (message: string) => {
-    const res = await fetch(`${API_BASE_URL}/chat/send`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...getAuthHeaders(),
-      },
-      body: JSON.stringify({ message }),
-    })
-
-    if (!res.ok) {
-      // Try JSON error, otherwise text
-      const err = await res.json().catch(() => ({ message: 'Request failed' }))
-      throw new Error(err.message || 'Request failed')
-    }
-
-    const contentType = res.headers.get('content-type') || ''
-    if (contentType.includes('application/json')) {
-      return res.json()
-    }
-
-    return res.text()
-  },
-}
