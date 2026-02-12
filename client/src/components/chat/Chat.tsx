@@ -55,13 +55,15 @@ export default function Chat() {
   return (
     <>
       {/* Floating Chat Button */}
-      <button
+      <Button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-40 flex items-center justify-center w-14 h-14 rounded-full bg-primary text-white shadow-lg hover:shadow-xl hover:scale-110 transition-all"
+        variant="secondary"
+        size="icon"
+        className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full shadow-lg hover:shadow-xl hover:scale-110"
         aria-label="Open chat"
       >
         {isOpen ? <X size={24} /> : <MessageCircle size={24} />}
-      </button>
+      </Button>
 
       {/* Chat Panel */}
       {isOpen && (
@@ -78,7 +80,7 @@ export default function Chat() {
           </div>
 
           {/* Messages Area */}
-          <ScrollArea className="flex-1 p-4 bg-background">
+          <ScrollArea className="flex-1 p-4 bg-background overflow-y-scroll [&>div>div]:pr-3">
             <div className="flex flex-col gap-3">
               {messages.map((m) => (
                 <ChatMessage key={m.id} message={m} />
@@ -97,7 +99,7 @@ export default function Chat() {
                 onKeyDown={onKeyDown}
                 className="min-h-[40px] resize-none"
               />
-              <Button onClick={send} disabled={loading} variant="default" size="sm" className="self-end">
+              <Button onClick={send} disabled={loading} variant="secondary" size="sm" className="self-end">
                 <Send size={18} />
               </Button>
             </div>
