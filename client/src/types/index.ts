@@ -72,3 +72,12 @@ export interface Hotel {
   createdById?: string;
   createdByUsername?: string;
 }
+
+export interface Favorite {
+  id: string;
+  userId: string;
+  event?: Event;
+  destination?: Destination;
+  review?: Review;
+  timestamp: string;
+}

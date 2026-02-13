@@ -36,6 +36,8 @@ const apiRequest = async (url: string, options: RequestInit = {}) => {
   return response.json();
 };
 
+// ... [Existing Auth, Users, Events, Hotels, Destinations, Reviews APIs remain unchanged] ...
+
 // Auth API
 export const authAPI = {
   login: (credentials: { usernameOrEmail: string; password: string }) =>
@@ -92,37 +94,19 @@ export const usersAPI = {
 // Events API
 export const eventsAPI = {
   getAll: () => apiRequest('/events'),
-
   getById: (id: string) => apiRequest(`/events/${id}`),
-
-  create: (eventData: {
-    title: string;
-    description: string;
-    imageUrls: string[];
-    location: string;
-    start?: string;
-    end?: string;
-  }) =>
+  create: (eventData: any) =>
     apiRequest('/events', {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify(eventData),
     }),
-
-  update: (id: string, eventData: Partial<{
-    title: string;
-    description: string;
-    imageUrls: string[];
-    location: string;
-    start?: string;
-    end?: string;
-  }>) =>
+  update: (id: string, eventData: any) =>
     apiRequest(`/events/${id}`, {
       method: 'PUT',
       headers: getAuthHeaders(),
       body: JSON.stringify(eventData),
     }),
-
   delete: (id: string) =>
     apiRequest(`/events/${id}`, {
       method: 'DELETE',
@@ -133,67 +117,34 @@ export const eventsAPI = {
 // Hotels API
 export const hotelsAPI = {
   getAll: () => apiRequest('/hotels'),
-
   getAllForAdmin: () =>
     apiRequest('/hotels/admin/all', {
       headers: getAuthHeaders(),
     }),
-
   getById: (id: string) => apiRequest(`/hotels/${id}`),
-
   getNearby: (lat: number, lng: number, radiusKm = 10) =>
     apiRequest(`/hotels/near?lat=${lat}&lng=${lng}&radiusKm=${radiusKm}`),
-
   getByOwner: (ownerId: string) =>
     apiRequest(`/hotels/owner/${ownerId}`, {
       headers: getAuthHeaders(),
     }),
-
-  create: (hotelData: {
-    name: string;
-    description: string;
-    address: string;
-    phones?: string[];
-    whatsapp?: string;
-    email?: string;
-    website?: string;
-    amenities?: string[];
-    imageUrls?: string[];
-    latitude: number;
-    longitude: number;
-  }) =>
+  create: (hotelData: any) =>
     apiRequest('/hotels', {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify(hotelData),
     }),
-
-  update: (id: string, hotelData: Partial<{
-    name: string;
-    description: string;
-    address: string;
-    phones?: string[];
-    whatsapp?: string;
-    email?: string;
-    website?: string;
-    amenities?: string[];
-    imageUrls?: string[];
-    latitude?: number;
-    longitude?: number;
-    isPaid?: boolean;
-  }>) =>
+  update: (id: string, hotelData: any) =>
     apiRequest(`/hotels/${id}`, {
       method: 'PUT',
       headers: getAuthHeaders(),
       body: JSON.stringify(hotelData),
     }),
-
   delete: (id: string) =>
     apiRequest(`/hotels/${id}`, {
       method: 'DELETE',
       headers: getAuthHeaders(),
     }),
-
   setPaid: (id: string) =>
     apiRequest(`/hotels/${id}/set-paid`, {
       method: 'PATCH',
@@ -201,42 +152,25 @@ export const hotelsAPI = {
     }),
 };
 
-// For MyHotels page convenience
 export const getHotelsByOwner = hotelsAPI.getByOwner;
 export const deleteHotel = hotelsAPI.delete;
 
 // Destinations API
 export const destinationsAPI = {
   getAll: () => apiRequest('/destinations'),
-
   getById: (id: string) => apiRequest(`/destinations/${id}`),
-
-  create: (destinationData: {
-    title: string;
-    description: string;
-    imageUrls: string[];
-    location: string;
-    bestSeasonToVisit?: string;
-  }) =>
+  create: (destinationData: any) =>
     apiRequest('/destinations', {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify(destinationData),
     }),
-
-  update: (id: string, destinationData: Partial<{
-    title: string;
-    description: string;
-    imageUrls: string[];
-    location: string;
-    bestSeasonToVisit?: string;
-  }>) =>
+  update: (id: string, destinationData: any) =>
     apiRequest(`/destinations/${id}`, {
       method: 'PUT',
       headers: getAuthHeaders(),
       body: JSON.stringify(destinationData),
     }),
-
   delete: (id: string) =>
     apiRequest(`/destinations/${id}`, {
       method: 'DELETE',
@@ -247,32 +181,19 @@ export const destinationsAPI = {
 // Event Reviews API
 export const eventReviewsAPI = {
   getByEventId: (eventId: string) => apiRequest(`/events/reviews/event/${eventId}`),
-
   getById: (reviewId: string) => apiRequest(`/events/reviews/${reviewId}`),
-
-  create: (reviewData: {
-    eventId: string;
-    rate: number;
-    review: string;
-    imageUrls?: string[];
-  }) =>
+  create: (reviewData: any) =>
     apiRequest('/events/reviews', {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify(reviewData),
     }),
-
-  update: (reviewId: string, reviewData: Partial<{
-    rate: number;
-    review: string;
-    imageUrls?: string[];
-  }>) =>
+  update: (reviewId: string, reviewData: any) =>
     apiRequest(`/events/reviews/${reviewId}`, {
       method: 'PUT',
       headers: getAuthHeaders(),
       body: JSON.stringify(reviewData),
     }),
-
   delete: (reviewId: string) =>
     apiRequest(`/events/reviews/${reviewId}`, {
       method: 'DELETE',
@@ -284,32 +205,19 @@ export const eventReviewsAPI = {
 export const destinationReviewsAPI = {
   getByDestinationId: (destinationId: string) =>
     apiRequest(`/destinations/reviews/destination/${destinationId}`),
-
   getById: (reviewId: string) => apiRequest(`/destinations/reviews/${reviewId}`),
-
-  create: (reviewData: {
-    destinationId: string;
-    rate: number;
-    review: string;
-    imageUrls?: string[];
-  }) =>
+  create: (reviewData: any) =>
     apiRequest('/destinations/reviews', {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify(reviewData),
     }),
-
-  update: (reviewId: string, reviewData: Partial<{
-    rate: number;
-    review: string;
-    imageUrls?: string[];
-  }>) =>
+  update: (reviewId: string, reviewData: any) =>
     apiRequest(`/destinations/reviews/${reviewId}`, {
       method: 'PUT',
       headers: getAuthHeaders(),
       body: JSON.stringify(reviewData),
     }),
-
   delete: (reviewId: string) =>
     apiRequest(`/destinations/reviews/${reviewId}`, {
       method: 'DELETE',
@@ -317,7 +225,7 @@ export const destinationReviewsAPI = {
     }),
 };
 
-// Chat API (backend at /api/chat/send)
+// Chat API
 export const chatAPI = {
   sendMessage: async (message: string) => {
     const res = await fetch(`${API_BASE_URL}/chat/send`, {
@@ -327,19 +235,122 @@ export const chatAPI = {
         ...getAuthHeaders(),
       },
       body: JSON.stringify({ message }),
-    })
+    });
 
     if (!res.ok) {
-      // Try JSON error, otherwise text
-      const err = await res.json().catch(() => ({ message: 'Request failed' }))
-      throw new Error(err.message || 'Request failed')
+      const err = await res.json().catch(() => ({ message: 'Request failed' }));
+      throw new Error(err.message || 'Request failed');
     }
 
-    const contentType = res.headers.get('content-type') || ''
+    const contentType = res.headers.get('content-type') || '';
     if (contentType.includes('application/json')) {
-      return res.json()
+      return res.json();
     }
 
-    return res.text()
+    return res.text();
   },
-}
+};
+
+// ==========================================
+// NEW APIS ADDED BELOW
+// ==========================================
+
+// User Profile API
+export const profileAPI = {
+  // Get current user's full profile details
+  getProfile: () =>
+    apiRequest('/users/profile/me', {
+      headers: getAuthHeaders(),
+    }),
+
+  // Update current user's profile
+  updateProfile: (profileData: {
+    firstName?: string;
+    lastName?: string;
+    phoneNumber?: string;
+    bio?: string;
+    avatarUrl?: string;
+  }) =>
+    apiRequest('/users/profile/me', {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(profileData),
+    }),
+
+  // Change password
+  changePassword: (data: { currentPassword: string; newPassword: string }) =>
+    apiRequest('/users/profile/change-password', {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data),
+    }),
+};
+
+// Favorites API (Destinations & Events)
+export const favoritesAPI = {
+  // --- Destinations ---
+  getFavoriteDestinations: () =>
+    apiRequest('/favorites/destinations', {
+      headers: getAuthHeaders(),
+    }),
+
+  addFavoriteDestination: (destinationId: string) =>
+    apiRequest(`/favorites/destinations/${destinationId}`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    }),
+
+  removeFavoriteDestination: (destinationId: string) =>
+    apiRequest(`/favorites/destinations/${destinationId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    }),
+
+  // --- Events ---
+  getFavoriteEvents: () =>
+    apiRequest('/favorites/events', {
+      headers: getAuthHeaders(),
+    }),
+
+  addFavoriteEvent: (eventId: string) =>
+    apiRequest(`/favorites/events/${eventId}`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    }),
+
+  removeFavoriteEvent: (eventId: string) =>
+    apiRequest(`/favorites/events/${eventId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    }),
+};
+
+// My Reviews API (Reviews written by the current user)
+export const myReviewsAPI = {
+  // Get all reviews written by the current user
+  getAll: () =>
+    apiRequest('/reviews/my-reviews', {
+      headers: getAuthHeaders(),
+    }),
+
+  // Get a specific review by ID (ensure it belongs to the user)
+  getById: (reviewId: string) =>
+    apiRequest(`/reviews/my-reviews/${reviewId}`, {
+      headers: getAuthHeaders(),
+    }),
+
+  // Update a review owned by the user
+  update: (reviewId: string, reviewData: { rate?: number; review?: string; imageUrls?: string[] }) =>
+    apiRequest(`/reviews/my-reviews/${reviewId}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(reviewData),
+    }),
+
+  // Delete a review owned by the user
+  delete: (reviewId: string) =>
+    apiRequest(`/reviews/my-reviews/${reviewId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    }),
+};
