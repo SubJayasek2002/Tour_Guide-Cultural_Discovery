@@ -22,4 +22,6 @@ public class UserResponse {
     private boolean enabled;
     private LocalDateTime createdAt;
     private LocalDateTime lastLoginAt;
+    private Set<String> favoriteDestinationIds;
+    private Set<String> favoriteEventIds;
 }

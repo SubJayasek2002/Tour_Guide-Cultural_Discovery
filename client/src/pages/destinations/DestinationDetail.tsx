@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { destinationsAPI, destinationReviewsAPI } from '@/services/api';
+import { destinationsAPI, destinationReviewsAPI, usersAPI } from '@/services/api';
 import type { Destination, Review } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -18,6 +18,7 @@ export default function DestinationDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, isAdmin } = useAuth();
+  const { refreshUser } = useAuth();
   const [destination, setDestination] = useState<Destination | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
@@ -68,6 +69,22 @@ export default function DestinationDetail() {
   const averageRating = reviews.length > 0
     ? reviews.reduce((sum, r) => sum + r.rate, 0) / reviews.length
     : 0;
+
+  const isFavorited = Boolean(id && user?.favoriteDestinationIds?.includes(id));
+
+  const handleToggleFavorite = async () => {
+    if (!id) return;
+    try {
+      if (isFavorited) {
+        await usersAPI.removeMyFavoriteDestination(id);
+      } else {
+        await usersAPI.addMyFavoriteDestination(id);
+      }
+      await refreshUser();
+    } catch (err) {
+      console.error('Failed to toggle favorite:', err);
+    }
+  };
 
   if (loading) {
     return (
@@ -128,7 +145,14 @@ export default function DestinationDetail() {
         <div className="max-w-4xl mx-auto">
           {/* Title and Rating */}
           <div className="bg-white rounded-lg shadow-md p-8 -mt-20 relative z-10 mb-8">
-            <h1 className="text-4xl font-bold mb-4 text-gray-900">{destination.title}</h1>
+            <div className="flex items-start justify-between">
+              <h1 className="text-4xl font-bold mb-4 text-gray-900">{destination.title}</h1>
+              {user && (
+                <Button variant="ghost" onClick={handleToggleFavorite} aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}>
+                  <Star className={`h-6 w-6 ${isFavorited ? 'fill-emerald-500 text-emerald-500' : 'text-gray-400'}`} />
+                </Button>
+              )}
+            </div>
 
             {/* Rating */}
             {reviews.length > 0 && (

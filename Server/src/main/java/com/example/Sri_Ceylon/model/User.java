@@ -13,6 +13,7 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import org.bson.types.ObjectId;
 
 @Data
 @NoArgsConstructor
@@ -45,6 +46,9 @@ public class User {
     
     private Set<Role> roles = new HashSet<>();
     
+    private Set<ObjectId> favoriteDestinationIds = new HashSet<>();
+
+    private Set<ObjectId> favoriteEventIds = new HashSet<>();
     private boolean enabled = true;
     
     private boolean accountNonLocked = true;
