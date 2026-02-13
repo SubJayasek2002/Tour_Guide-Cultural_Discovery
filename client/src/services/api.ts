@@ -87,6 +87,54 @@ export const usersAPI = {
       method: 'DELETE',
       headers: getAuthHeaders(),
     }),
+  // Favorites for authenticated user
+  getMyFavoriteDestinations: () =>
+    apiRequest('/users/me/favorites/destinations', { headers: getAuthHeaders() }),
+
+  addMyFavoriteDestination: (destinationId: string) =>
+    apiRequest(`/users/me/favorites/destinations/${destinationId}`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    }),
+
+  removeMyFavoriteDestination: (destinationId: string) =>
+    apiRequest(`/users/me/favorites/destinations/${destinationId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    }),
+
+  getMyFavoriteEvents: () =>
+    apiRequest('/users/me/favorites/events', { headers: getAuthHeaders() }),
+
+  addMyFavoriteEvent: (eventId: string) =>
+    apiRequest(`/users/me/favorites/events/${eventId}`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    }),
+
+  removeMyFavoriteEvent: (eventId: string) =>
+    apiRequest(`/users/me/favorites/events/${eventId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    }),
+
+  // Profile endpoints for authenticated user
+  getMyProfile: () =>
+    apiRequest('/users/me/profile', { headers: getAuthHeaders() }),
+
+  updateMe: (data: { fullName?: string; email?: string }) =>
+    apiRequest('/users/me', {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data),
+    }),
+
+  changePassword: (data: { currentPassword: string; newPassword: string }) =>
+    apiRequest('/users/me/password', {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data),
+    }),
 };
 
 // Events API

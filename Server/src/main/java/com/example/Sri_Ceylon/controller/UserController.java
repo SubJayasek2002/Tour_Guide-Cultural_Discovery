@@ -71,4 +71,68 @@ public class UserController {
         UserResponse userResponse = userService.toggleUserStatus(id);
         return ResponseEntity.ok(userResponse);
     }
+
+    // --- Endpoints for the authenticated user (use id from JWT/principal) ---
+    @GetMapping("/me/favorites/destinations")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Set<String>> getMyFavoriteDestinations(Authentication authentication) {
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        Set<String> favorites = userService.getFavoriteDestinations(userDetails.getId());
+        return ResponseEntity.ok(favorites);
+    }
+
+    @PostMapping("/me/favorites/destinations/{destinationId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Set<String>> addMyFavoriteDestination(Authentication authentication, @PathVariable String destinationId) {
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        Set<String> favorites = userService.addFavoriteDestination(userDetails.getId(), destinationId);
+        return ResponseEntity.ok(favorites);
+    }
+
+    @DeleteMapping("/me/favorites/destinations/{destinationId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Set<String>> removeMyFavoriteDestination(Authentication authentication, @PathVariable String destinationId) {
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        Set<String> favorites = userService.removeFavoriteDestination(userDetails.getId(), destinationId);
+        return ResponseEntity.ok(favorites);
+    }
+
+    @GetMapping("/me/favorites/events")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Set<String>> getMyFavoriteEvents(Authentication authentication) {
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        Set<String> favorites = userService.getFavoriteEvents(userDetails.getId());
+        return ResponseEntity.ok(favorites);
+    }
+
+    @PostMapping("/me/favorites/events/{eventId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Set<String>> addMyFavoriteEvent(Authentication authentication, @PathVariable String eventId) {
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        Set<String> favorites = userService.addFavoriteEvent(userDetails.getId(), eventId);
+        return ResponseEntity.ok(favorites);
+    }
+
+    @DeleteMapping("/me/favorites/events/{eventId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Set<String>> removeMyFavoriteEvent(Authentication authentication, @PathVariable String eventId) {
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        Set<String> favorites = userService.removeFavoriteEvent(userDetails.getId(), eventId);
+        return ResponseEntity.ok(favorites);
+    }
+
+    // --- Admin endpoints to manage favorites for any user ---
+    @GetMapping("/{id}/favorites/destinations")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Set<String>> getFavoriteDestinations(@PathVariable String id) {
+        Set<String> favorites = userService.getFavoriteDestinations(id);
+        return ResponseEntity.ok(favorites);
+    }
+
+    @GetMapping("/{id}/favorites/events")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Set<String>> getFavoriteEvents(@PathVariable String id) {
+        Set<String> favorites = userService.getFavoriteEvents(id);
+        return ResponseEntity.ok(favorites);
+    }
 }

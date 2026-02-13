@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { eventsAPI, eventReviewsAPI } from '@/services/api';
+import { eventsAPI, eventReviewsAPI, usersAPI } from '@/services/api';
 import type { Event, Review } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -17,7 +17,7 @@ import AutoScrollCarousel from '@/components/shared/AutoScrollCarousel';
 export default function EventDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, refreshUser } = useAuth();
   const [event, setEvent] = useState<Event | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
@@ -89,6 +89,22 @@ export default function EventDetail() {
     ? reviews.reduce((sum, r) => sum + r.rate, 0) / reviews.length
     : 0;
 
+  const isFavorited = Boolean(id && user?.favoriteEventIds?.includes(id));
+
+  const handleToggleFavorite = async () => {
+    if (!id) return;
+    try {
+      if (isFavorited) {
+        await usersAPI.removeMyFavoriteEvent(id);
+      } else {
+        await usersAPI.addMyFavoriteEvent(id);
+      }
+      await refreshUser();
+    } catch (err) {
+      console.error('Failed to toggle favorite event:', err);
+    }
+  };
+
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -146,7 +162,14 @@ export default function EventDetail() {
         <div className="max-w-4xl mx-auto">
           {/* Title and Rating */}
           <div className="bg-white rounded-lg shadow-md p-8 -mt-20 relative z-10 mb-8">
-            <h1 className="text-4xl font-bold mb-4 text-gray-900">{event.title}</h1>
+            <div className="flex items-start justify-between">
+              <h1 className="text-4xl font-bold mb-4 text-gray-900">{event.title}</h1>
+              {user && (
+                <Button variant="ghost" onClick={handleToggleFavorite} aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}>
+                  <Star className={`h-6 w-6 ${isFavorited ? 'fill-teal-500 text-teal-500' : 'text-gray-400'}`} />
+                </Button>
+              )}
+            </div>
 
             {/* Rating */}
             {reviews.length > 0 && (
