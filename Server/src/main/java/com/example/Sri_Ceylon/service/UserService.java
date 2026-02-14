@@ -2,7 +2,6 @@ package com.example.Sri_Ceylon.service;
 
 import com.example.Sri_Ceylon.dto.UpdateUserRequest;
 import com.example.Sri_Ceylon.dto.UserResponse;
-import com.example.Sri_Ceylon.dto.UserProfileResponse;
 import com.example.Sri_Ceylon.dto.DestinationResponse;
 import com.example.Sri_Ceylon.dto.EventResponse;
 import com.example.Sri_Ceylon.model.Role;
@@ -33,75 +32,75 @@ import org.springframework.data.mongodb.core.query.Criteria;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    
+
     private final UserRepository userRepository;
     private final DestinationRepository destinationRepository;
     private final EventRepository eventRepository;
     private final PasswordEncoder passwordEncoder;
     private final MongoTemplate mongoTemplate;
-    
+
     public List<UserResponse> getAllUsers() {
         return userRepository.findAll().stream()
                 .map(this::convertToUserResponse)
                 .collect(Collectors.toList());
     }
-    
+
     public UserResponse getUserById(String id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
         return convertToUserResponse(user);
     }
-    
+
     public UserResponse getUserByUsername(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
         return convertToUserResponse(user);
     }
-    
+
     @Transactional
     public UserResponse updateUser(String id, UpdateUserRequest updateRequest) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
-        
+
         if (updateRequest.getUsername() != null && !updateRequest.getUsername().equals(user.getUsername())) {
             if (userRepository.existsByUsername(updateRequest.getUsername())) {
                 throw new RuntimeException("Username is already taken!");
             }
             user.setUsername(updateRequest.getUsername());
         }
-        
+
         if (updateRequest.getEmail() != null && !updateRequest.getEmail().equals(user.getEmail())) {
             if (userRepository.existsByEmail(updateRequest.getEmail())) {
                 throw new RuntimeException("Email is already in use!");
             }
             user.setEmail(updateRequest.getEmail());
         }
-        
+
         if (updateRequest.getFirstName() != null) {
             user.setFirstName(updateRequest.getFirstName());
         }
-        
+
         if (updateRequest.getLastName() != null) {
             user.setLastName(updateRequest.getLastName());
         }
-        
+
         if (updateRequest.getPhoneNumber() != null) {
             user.setPhoneNumber(updateRequest.getPhoneNumber());
         }
-        
+
         user.setUpdatedAt(LocalDateTime.now());
         User updatedUser = userRepository.save(user);
-        
+
         return convertToUserResponse(updatedUser);
     }
-    
+
     @Transactional
     public void deleteUser(String id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
         userRepository.delete(user);
     }
-    
+
     @Transactional
     public UserResponse toggleUserStatus(String id) {
         User user = userRepository.findById(id)
@@ -117,8 +116,8 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
         return user.getFavoriteDestinationIds().stream()
-            .map(ObjectId::toHexString)
-            .collect(Collectors.toSet());
+                .map(ObjectId::toHexString)
+                .collect(Collectors.toSet());
     }
 
     @Transactional
@@ -129,8 +128,8 @@ public class UserService {
         user.setUpdatedAt(LocalDateTime.now());
         userRepository.save(user);
         return user.getFavoriteDestinationIds().stream()
-            .map(ObjectId::toHexString)
-            .collect(Collectors.toSet());
+                .map(ObjectId::toHexString)
+                .collect(Collectors.toSet());
     }
 
     @Transactional
@@ -141,8 +140,8 @@ public class UserService {
         user.setUpdatedAt(LocalDateTime.now());
         userRepository.save(user);
         return user.getFavoriteDestinationIds().stream()
-            .map(ObjectId::toHexString)
-            .collect(Collectors.toSet());
+                .map(ObjectId::toHexString)
+                .collect(Collectors.toSet());
     }
 
     @Transactional(readOnly = true)
@@ -150,8 +149,8 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
         return user.getFavoriteEventIds().stream()
-            .map(ObjectId::toHexString)
-            .collect(Collectors.toSet());
+                .map(ObjectId::toHexString)
+                .collect(Collectors.toSet());
     }
 
     @Transactional
@@ -162,8 +161,8 @@ public class UserService {
         user.setUpdatedAt(LocalDateTime.now());
         userRepository.save(user);
         return user.getFavoriteEventIds().stream()
-            .map(ObjectId::toHexString)
-            .collect(Collectors.toSet());
+                .map(ObjectId::toHexString)
+                .collect(Collectors.toSet());
     }
 
     @Transactional
@@ -179,8 +178,9 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserProfileResponse getUserProfile(String id) {
-        // Use aggregation to fetch the user together with populated favorite destinations and events
+    public UserResponse getUserProfile(String id) {
+        // Use aggregation to fetch the user together with populated favorite
+        // destinations and events
         MatchOperation matchUser = Aggregation.match(Criteria.where("_id").is(new ObjectId(id)));
         LookupOperation lookupDest = LookupOperation.newLookup()
                 .from("destinations")
@@ -200,9 +200,11 @@ public class UserService {
             throw new UsernameNotFoundException("User not found with id: " + id);
         }
 
-        // Convert base user part using existing mapping (convertToUserResponse expects User model)
+        // Convert base user part using existing mapping (convertToUserResponse expects
+        // User model)
         // Load user separately for fields that are easier from the entity
-        User user = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
         UserResponse userResp = convertToUserResponse(user);
 
         List<DestinationResponse> destResponses = new ArrayList<>();
@@ -219,7 +221,8 @@ public class UserService {
                 r.setLatitude(d.getDouble("latitude"));
                 r.setLongitude(d.getDouble("longitude"));
                 r.setTimestamp((java.time.LocalDateTime) d.get("timestamp"));
-                // createdBy is a DBRef; aggregation may include it as a Document or DBRef; skip for now
+                // createdBy is a DBRef; aggregation may include it as a Document or DBRef; skip
+                // for now
                 destResponses.add(r);
             }
         }
@@ -236,11 +239,13 @@ public class UserService {
                 // start/end may be stored as Date; handle carefully
                 Object startObj = e.get("start");
                 if (startObj instanceof java.util.Date) {
-                    r.setStart(((java.util.Date) startObj).toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime());
+                    r.setStart(((java.util.Date) startObj).toInstant().atZone(java.time.ZoneId.systemDefault())
+                            .toLocalDateTime());
                 }
                 Object endObj = e.get("end");
                 if (endObj instanceof java.util.Date) {
-                    r.setEnd(((java.util.Date) endObj).toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime());
+                    r.setEnd(((java.util.Date) endObj).toInstant().atZone(java.time.ZoneId.systemDefault())
+                            .toLocalDateTime());
                 }
                 r.setLocation(e.getString("location"));
                 r.setLatitude(e.getDouble("latitude"));
@@ -250,10 +255,19 @@ public class UserService {
             }
         }
 
-        UserProfileResponse profile = new UserProfileResponse();
-        profile.setUser(userResp);
-        profile.setFavoriteDestinations(destResponses);
-        profile.setFavoriteEvents(eventResponses);
+        UserResponse profile = new UserResponse();
+        profile.setId(userResp.getId());
+        profile.setUsername(userResp.getUsername());
+        profile.setEmail(userResp.getEmail());
+        profile.setFirstName(userResp.getFirstName());
+        profile.setLastName(userResp.getLastName());
+        profile.setPhoneNumber(userResp.getPhoneNumber());
+        profile.setRoles(userResp.getRoles());
+        profile.setEnabled(userResp.isEnabled());
+        profile.setCreatedAt(userResp.getCreatedAt());
+        profile.setLastLoginAt(userResp.getLastLoginAt());
+        profile.setFavoriteDestinationIds(userResp.getFavoriteDestinationIds());
+        profile.setFavoriteEventIds(userResp.getFavoriteEventIds());
         return profile;
     }
 
@@ -270,7 +284,7 @@ public class UserService {
         user.setUpdatedAt(LocalDateTime.now());
         userRepository.save(user);
     }
-    
+
     private UserResponse convertToUserResponse(User user) {
         UserResponse response = new UserResponse();
         response.setId(user.getId());
@@ -286,11 +300,11 @@ public class UserService {
         response.setCreatedAt(user.getCreatedAt());
         response.setLastLoginAt(user.getLastLoginAt());
         response.setFavoriteDestinationIds(user.getFavoriteDestinationIds().stream()
-            .map(ObjectId::toHexString)
-            .collect(Collectors.toSet()));
+                .map(ObjectId::toHexString)
+                .collect(Collectors.toSet()));
         response.setFavoriteEventIds(user.getFavoriteEventIds().stream()
-            .map(ObjectId::toHexString)
-            .collect(Collectors.toSet()));
+                .map(ObjectId::toHexString)
+                .collect(Collectors.toSet()));
         return response;
     }
 }
