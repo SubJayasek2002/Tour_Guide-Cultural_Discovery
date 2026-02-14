@@ -19,6 +19,7 @@ import ManageHotels from './pages/admin/ManageHotels';
 import Hotels from './pages/hotels/Hotels';
 import HotelRegistration from './pages/hotels/HotelRegistration'; // Import the new component
 import PaymentPage from './pages/PaymentPage'; // Create this component next
+import UserProfile from './pages/profile/UserProfile';
           
 
 function App() {
@@ -93,6 +94,18 @@ function App() {
               <Layout>
                 <PaymentPage />
               </Layout>
+            }
+          />
+
+          {/* User Profile - Protected */}
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <UserProfile />
+                </Layout>
+              </ProtectedRoute>
             }
           />
 

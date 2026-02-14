@@ -9,6 +9,8 @@ interface User {
   firstName: string;
   lastName: string;
   roles: string[];
+  favoriteDestinationIds?: string[];
+  favoriteEventIds?: string[];
 }
 
 interface AuthContextType {
@@ -26,6 +28,7 @@ interface AuthContextType {
   logout: () => void;
   isAdmin: boolean;
   isAuthenticated: boolean;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -51,17 +54,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     initAuth();
   }, []);
 
+  const refreshUser = async () => {
+    try {
+      const userData = await authAPI.getCurrentUser();
+      setUser(userData);
+    } catch (err) {
+      setUser(null);
+    }
+  };
+
   const login = async (usernameOrEmail: string, password: string) => {
     const response = await authAPI.login({ usernameOrEmail, password });
     setAuthToken(response.token);
-    setUser({
-      id: response.id,
-      username: response.username,
-      email: response.email,
-      firstName: response.firstName || '',
-      lastName: response.lastName || '',
-      roles: response.roles,
-    });
+    // Fetch full user (includes favorites)
+    await refreshUser();
   };
 
   const signup = async (userData: {
@@ -85,7 +91,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const isAuthenticated = user !== null;
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, signup, logout, isAdmin, isAuthenticated }}>
+    <AuthContext.Provider value={{ user, loading, login, signup, logout, isAdmin, isAuthenticated, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );
