@@ -31,37 +31,34 @@ import jakarta.annotation.PostConstruct;
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class FileUploadController {
 
-    private final Path uploadDir = Paths.get("uploads/profile-images");
+    private final Path profileUploadDir = Paths.get("uploads/profile-images");
+    private final Path imageUploadDir = Paths.get("uploads/images");
 
     @PostConstruct
     public void init() {
         try {
-            Files.createDirectories(uploadDir);
+            Files.createDirectories(profileUploadDir);
+            Files.createDirectories(imageUploadDir);
         } catch (IOException e) {
-            throw new RuntimeException("Could not create upload directory!", e);
+            throw new RuntimeException("Could not create upload directories!", e);
         }
     }
 
-    @PostMapping("/upload/profile-image")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Map<String, String>> uploadProfileImage(@RequestParam("file") MultipartFile file) {
+    private ResponseEntity<Map<String, String>> handleUpload(MultipartFile file, Path targetDir, String urlPrefix, long maxSizeMB) {
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("message", "Please select a file to upload"));
         }
 
-        // Validate file type
         String contentType = file.getContentType();
         if (contentType == null || !contentType.startsWith("image/")) {
             return ResponseEntity.badRequest().body(Map.of("message", "Only image files are allowed"));
         }
 
-        // Validate file size (max 5MB)
-        if (file.getSize() > 5 * 1024 * 1024) {
-            return ResponseEntity.badRequest().body(Map.of("message", "File size must be less than 5MB"));
+        if (file.getSize() > maxSizeMB * 1024 * 1024) {
+            return ResponseEntity.badRequest().body(Map.of("message", "File size must be less than " + maxSizeMB + "MB"));
         }
 
         try {
-            // Generate unique filename
             String originalFilename = file.getOriginalFilename();
             String extension = "";
             if (originalFilename != null && originalFilename.contains(".")) {
@@ -69,12 +66,10 @@ public class FileUploadController {
             }
             String filename = UUID.randomUUID().toString() + extension;
 
-            // Save file
-            Path filePath = uploadDir.resolve(filename);
+            Path filePath = targetDir.resolve(filename);
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-            // Return the URL to access the file
-            String imageUrl = "/api/uploads/profile-images/" + filename;
+            String imageUrl = urlPrefix + filename;
             return ResponseEntity.ok(Map.of("imageUrl", imageUrl));
 
         } catch (IOException e) {
@@ -82,10 +77,31 @@ public class FileUploadController {
         }
     }
 
+    @PostMapping("/upload/profile-image")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Map<String, String>> uploadProfileImage(@RequestParam("file") MultipartFile file) {
+        return handleUpload(file, profileUploadDir, "/api/uploads/profile-images/", 5);
+    }
+
+    @PostMapping("/upload/image")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file) {
+        return handleUpload(file, imageUploadDir, "/api/uploads/images/", 10);
+    }
+
+    @GetMapping("/uploads/images/{filename}")
+    public ResponseEntity<Resource> getImage(@PathVariable String filename) {
+        return serveFile(imageUploadDir, filename);
+    }
+
     @GetMapping("/uploads/profile-images/{filename}")
     public ResponseEntity<Resource> getProfileImage(@PathVariable String filename) {
+        return serveFile(profileUploadDir, filename);
+    }
+
+    private ResponseEntity<Resource> serveFile(Path directory, String filename) {
         try {
-            Path filePath = uploadDir.resolve(filename).normalize();
+            Path filePath = directory.resolve(filename).normalize();
             Resource resource = new UrlResource(filePath.toUri());
 
             if (!resource.exists() || !resource.isReadable()) {
