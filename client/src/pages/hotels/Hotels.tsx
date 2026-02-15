@@ -137,12 +137,6 @@ export default function Hotels() {
             <p className="text-gray-600 mt-1">Search hotels by map radius. Discover the perfect stay for your journey.</p>
           </div>
           <div className="flex flex-wrap gap-3 items-center">
-            <Button asChild className="bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-cyan-400 hover:to-blue-700">
-              <Link to="/hotels/register">
-                <Plus className="h-4 w-4 mr-2" />
-                Register Your Hotel
-              </Link>
-            </Button>
           <div className="flex gap-2 border rounded-lg p-1 bg-white">
             <Button
               variant={viewMode === 'map' ? 'default' : 'outline'}
