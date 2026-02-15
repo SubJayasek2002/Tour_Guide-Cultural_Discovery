@@ -9,6 +9,7 @@ public class EventReviewResponse {
     private String eventTitle;
     private String userId;
     private String username;
+    private String userProfileImageUrl;
     private Integer rate;
     private String review;
     private List<String> imageUrls;
@@ -56,6 +57,14 @@ public class EventReviewResponse {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getUserProfileImageUrl() {
+        return userProfileImageUrl;
+    }
+
+    public void setUserProfileImageUrl(String userProfileImageUrl) {
+        this.userProfileImageUrl = userProfileImageUrl;
     }
 
     public Integer getRate() {

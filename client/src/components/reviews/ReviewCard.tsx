@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { Review } from '@/types';
 import { Card, CardContent } from '../ui/card';
-import { Avatar } from '../ui/avatar';
+import { Avatar, AvatarImage, AvatarFallback } from '../ui/avatar';
 import { Star, Trash2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import ImageSlider from '../shared/ImageSlider';
@@ -60,10 +60,13 @@ export default function ReviewCard({ review, currentUserId, isAdmin, onDelete }:
           {/* Header */}
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center space-x-3">
-              <Avatar className="h-10 w-10 bg-gradient-to-br from-orange-400 to-red-500">
-                <div className="w-full h-full flex items-center justify-center text-white font-semibold">
+              <Avatar className="h-10 w-10">
+                {review.userProfileImageUrl ? (
+                  <AvatarImage src={review.userProfileImageUrl} alt={review.username} />
+                ) : null}
+                <AvatarFallback className="bg-gradient-to-br from-orange-400 to-red-500 text-white font-semibold">
                   {review.username.charAt(0).toUpperCase()}
-                </div>
+                </AvatarFallback>
               </Avatar>
               <div>
                 <p className="font-semibold text-gray-900">{review.username}</p>

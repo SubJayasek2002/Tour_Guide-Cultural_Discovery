@@ -107,6 +107,7 @@ public class EventReviewService {
         if (review.getUser() != null) {
             response.setUserId(review.getUser().getId());
             response.setUsername(review.getUser().getUsername());
+            response.setUserProfileImageUrl(review.getUser().getProfileImageUrl());
         }
         
         return response;
