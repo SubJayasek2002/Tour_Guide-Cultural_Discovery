@@ -254,6 +254,37 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Register Your Hotel Section */}
+      <section className="py-24 bg-gradient-to-br from-cyan-900 via-teal-800 to-emerald-900 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-10 left-10 w-72 h-72 bg-cyan-400 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-10 right-10 w-96 h-96 bg-emerald-400 rounded-full blur-3xl"></div>
+        </div>
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <div className="max-w-4xl mx-auto">
+            <div className="h-20 w-20 bg-gradient-to-br from-cyan-400 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl">
+              <Building className="h-10 w-10 text-white" />
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              Own a Hotel?
+              <span className="bg-gradient-to-r from-cyan-300 to-teal-300 bg-clip-text text-transparent"> List It With Us</span>
+            </h2>
+            <p className="text-xl text-cyan-100 mb-10 max-w-2xl mx-auto leading-relaxed">
+              Reach thousands of travelers exploring Sri Lanka. Register your hotel today and showcase
+              your property to guests searching for the perfect stay.
+            </p>
+            <Button asChild size="lg" className="bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white shadow-lg hover:shadow-xl transition-all text-lg px-10 py-6">
+              <Link to="/hotels/register">
+                Register Your Hotel
+              </Link>
+            </Button>
+            <p className="mt-6 text-sm text-cyan-200/70">
+              Free to list ΓÇó Get discovered by travelers worldwide
+            </p>
+          </div>
+        </div>
+      </section>
+
       <div className="container mx-auto p-6">
         <Chat />
       </div>
