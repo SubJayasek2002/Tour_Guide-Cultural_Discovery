@@ -101,7 +101,7 @@ export default function UserProfile() {
     if (!file) return;
 
     // Validate file type
-    if (!file.type.startsWith('image/')) {
+      if (!(file.type === 'image/jpeg' || file.type === 'image/png')) {
       setMessage({ type: 'error', text: 'Please select an image file (JPG, PNG, etc.)' });
       return;
     }

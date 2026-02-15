@@ -18,6 +18,16 @@ const getAuthHeaders = (): Record<string, string> => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
+const backendOrigin = API_BASE_URL.replace(/\/api$/, '');
+
+function normalizeImageUrls<T extends { imageUrls?: string[] }>(item: T): T {
+  if (!item || !item.imageUrls) return item;
+  return {
+    ...item,
+    imageUrls: item.imageUrls.map((u) => (typeof u === 'string' && u.startsWith('/') ? `${backendOrigin}${u}` : u)),
+  };
+}
+
 // Generic API request handler
 const apiRequest = async (url: string, options: RequestInit = {}) => {
   const response = await fetch(`${API_BASE_URL}${url}`, {
@@ -142,7 +152,19 @@ export const usersAPI = {
       const error = await response.json().catch(() => ({ message: 'Upload failed' }));
       throw new Error(error.message || 'Upload failed');
     }
-    return response.json();
+    const body = await response.json();
+    // Normalize returned imageUrl to absolute URL so browser can load it from client origin
+    // Server returns paths like `/api/uploads/profile-images/<file>`
+    if (body?.imageUrl && typeof body.imageUrl === 'string') {
+      const imageUrl: string = body.imageUrl;
+      if (imageUrl.startsWith('/')) {
+        // derive backend origin (strip trailing '/api' from API_BASE_URL)
+        const backendOrigin = API_BASE_URL.replace(/\/api$/, '');
+        return { imageUrl: `${backendOrigin}${imageUrl}` };
+      }
+      return { imageUrl };
+    }
+    return body;
   },
 
   changePassword: (data: { currentPassword: string; newPassword: string }) =>
@@ -197,21 +219,30 @@ export const eventsAPI = {
 // Hotels API
 export const hotelsAPI = {
   getAll: () => apiRequest('/hotels'),
+  getAll: async () => {
+    const data = await apiRequest('/hotels');
+    if (Array.isArray(data)) return data.map((h) => normalizeImageUrls(h));
+    return data;
+  },
+  getAllForAdmin: async () => {
+    const data = await apiRequest('/hotels/admin/all', { headers: getAuthHeaders() });
+    if (Array.isArray(data)) return data.map((h) => normalizeImageUrls(h));
+    return data;
+  },
 
-  getAllForAdmin: () =>
-    apiRequest('/hotels/admin/all', {
-      headers: getAuthHeaders(),
-    }),
-
-  getById: (id: string) => apiRequest(`/hotels/${id}`),
+  getById: async (id: string) => {
+    const data = await apiRequest(`/hotels/${id}`);
+    return normalizeImageUrls(data);
+  },
 
   getNearby: (lat: number, lng: number, radiusKm = 10) =>
     apiRequest(`/hotels/near?lat=${lat}&lng=${lng}&radiusKm=${radiusKm}`),
 
-  getByOwner: (ownerId: string) =>
-    apiRequest(`/hotels/owner/${ownerId}`, {
-      headers: getAuthHeaders(),
-    }),
+  getByOwner: async (ownerId: string) => {
+    const data = await apiRequest(`/hotels/owner/${ownerId}`, { headers: getAuthHeaders() });
+    if (Array.isArray(data)) return data.map((h) => normalizeImageUrls(h));
+    return data;
+  },
 
   create: (hotelData: {
     name: string;
