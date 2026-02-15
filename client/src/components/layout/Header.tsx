@@ -73,9 +73,17 @@ export default function Header() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="flex items-center space-x-2 hover:bg-emerald-50">
-                    <div className="h-8 w-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-md">
-                      <User className="h-4 w-4 text-white" />
-                    </div>
+                    {user.profileImageUrl ? (
+                      <img
+                        src={user.profileImageUrl}
+                        alt="Profile"
+                        className="h-8 w-8 rounded-full object-cover shadow-md"
+                      />
+                    ) : (
+                      <div className="h-8 w-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-md">
+                        <User className="h-4 w-4 text-white" />
+                      </div>
+                    )}
                     <span className="hidden md:inline text-sm font-medium text-gray-400">
                       {user.firstName || user.username}
                     </span>

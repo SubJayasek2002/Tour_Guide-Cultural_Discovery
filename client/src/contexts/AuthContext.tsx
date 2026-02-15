@@ -8,6 +8,7 @@ interface User {
   email: string;
   firstName: string;
   lastName: string;
+  profileImageUrl?: string;
   roles: string[];
   favoriteDestinationIds?: string[];
   favoriteEventIds?: string[];

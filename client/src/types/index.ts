@@ -48,6 +48,7 @@ export interface User {
   firstName: string;
   lastName: string;
   phoneNumber: string;
+  profileImageUrl?: string;
   roles: string[];
   enabled: boolean;
   createdAt: string;
