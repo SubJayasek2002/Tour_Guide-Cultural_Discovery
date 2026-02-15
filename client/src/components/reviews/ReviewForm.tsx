@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
-import { Star, Upload, X } from 'lucide-react';
+import { Star, X, ImagePlus, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Input } from '../ui/input';
+import { usersAPI } from '../../services/api';
+import { toast } from 'sonner';
 
 interface ReviewFormProps {
   onSubmit: (data: { rate: number; review: string; imageUrls: string[] }) => Promise<void>;
@@ -20,15 +21,70 @@ export default function ReviewForm({ onSubmit, initialData, submitLabel = 'Submi
   const [hoverRating, setHoverRating] = useState(0);
   const [reviewText, setReviewText] = useState(initialData?.review || '');
   const [imageUrls, setImageUrls] = useState<string[]>(initialData?.imageUrls || []);
-  const [newImageUrl, setNewImageUrl] = useState('');
+  const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const previewUrlsRef = useRef<string[]>([]);
+  const [localPreviews, setLocalPreviews] = useState<string[]>([]);
 
-  const handleAddImage = () => {
-    if (newImageUrl.trim() && imageUrls.length < 5) {
-      setImageUrls([...imageUrls, newImageUrl.trim()]);
-      setNewImageUrl('');
+  useEffect(() => {
+    return () => {
+      previewUrlsRef.current.forEach((u) => URL.revokeObjectURL(u));
+      previewUrlsRef.current = [];
+    };
+  }, []);
+
+  const handleFilesSelected = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+
+    const remaining = 5 - imageUrls.length;
+    if (remaining <= 0) {
+      toast.error('Maximum 5 images allowed');
+      return;
     }
+
+    const filesToUpload = Array.from(files).slice(0, remaining);
+    setUploading(true);
+
+    for (const file of filesToUpload) {
+      // Show local preview immediately
+      const tempUrl = URL.createObjectURL(file);
+      previewUrlsRef.current.push(tempUrl);
+      setLocalPreviews((p) => [...p, tempUrl]);
+
+      if (!(file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/webp')) {
+        toast.error(`${file.name} is not a supported image type (JPEG/PNG/WebP)`);
+        setLocalPreviews((p) => p.filter((u) => u !== tempUrl));
+        previewUrlsRef.current = previewUrlsRef.current.filter((u) => u !== tempUrl);
+        continue;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error(`${file.name} exceeds 5MB limit`);
+        setLocalPreviews((p) => p.filter((u) => u !== tempUrl));
+        previewUrlsRef.current = previewUrlsRef.current.filter((u) => u !== tempUrl);
+        continue;
+      }
+
+      try {
+        const res = await usersAPI.uploadProfileImage(file);
+        if (res?.imageUrl) {
+          setImageUrls((prev) => [...prev, res.imageUrl]);
+          setLocalPreviews((p) => p.filter((u) => u !== tempUrl));
+          previewUrlsRef.current = previewUrlsRef.current.filter((u) => u !== tempUrl);
+        }
+      } catch (err: any) {
+        console.error('Upload failed for', file.name, err);
+        toast.error(`Failed to upload ${file.name}`);
+        setLocalPreviews((p) => p.filter((u) => u !== tempUrl));
+        previewUrlsRef.current = previewUrlsRef.current.filter((u) => u !== tempUrl);
+      }
+    }
+
+    setUploading(false);
+    // Reset input so the same file can be selected again
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleRemoveImage = (index: number) => {
@@ -70,6 +126,8 @@ export default function ReviewForm({ onSubmit, initialData, submitLabel = 'Submi
       setLoading(false);
     }
   };
+
+  const allPreviews = [...imageUrls, ...localPreviews];
 
   return (
     <Card>
@@ -131,68 +189,81 @@ export default function ReviewForm({ onSubmit, initialData, submitLabel = 'Submi
             />
           </div>
 
-          {/* Image URLs */}
+          {/* Image Upload */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Add Images (Optional)
+              Add Photos (Optional)
             </label>
-            
-            {/* Image URL Input */}
-            <div className="flex gap-2 mb-3">
-              <Input
-                type="url"
-                placeholder="Enter image URL"
-                value={newImageUrl}
-                onChange={(e) => setNewImageUrl(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleAddImage();
-                  }
-                }}
-              />
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleAddImage}
-                disabled={!newImageUrl.trim() || imageUrls.length >= 5}
-              >
-                <Upload className="h-4 w-4 mr-2" />
-                Add
-              </Button>
-            </div>
 
-            {/* Image Preview */}
-            {imageUrls.length > 0 && (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {imageUrls.map((url, index) => (
-                  <div key={index} className="relative aspect-square rounded-lg overflow-hidden group">
+            {/* Hidden file input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              multiple
+              className="hidden"
+              onChange={(e) => handleFilesSelected(e.target.files)}
+            />
+
+            {/* Image Previews + Upload Button */}
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+              {/* Existing uploaded images */}
+              {allPreviews.map((url, index) => {
+                const isLocalPreview = index >= imageUrls.length;
+                return (
+                  <div key={url + index} className="relative aspect-square rounded-lg overflow-hidden group border border-gray-200">
                     <img
                       src={url}
                       alt={`Review image ${index + 1}`}
-                      className="w-full h-full object-cover"
+                      className={`w-full h-full object-cover ${isLocalPreview ? 'opacity-50' : ''}`}
                     />
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveImage(index)}
-                      className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
+                    {isLocalPreview && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Loader2 className="h-5 w-5 text-emerald-600 animate-spin" />
+                      </div>
+                    )}
+                    {!isLocalPreview && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveImage(index)}
+                        className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    )}
                   </div>
-                ))}
-              </div>
-            )}
+                );
+              })}
+
+              {/* Add image button */}
+              {imageUrls.length < 5 && (
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="aspect-square rounded-lg border-2 border-dashed border-gray-300 hover:border-emerald-400 hover:bg-emerald-50/50 flex flex-col items-center justify-center gap-1 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {uploading ? (
+                    <Loader2 className="h-6 w-6 text-emerald-500 animate-spin" />
+                  ) : (
+                    <ImagePlus className="h-6 w-6 text-gray-400" />
+                  )}
+                  <span className="text-[10px] text-gray-400 font-medium">
+                    {uploading ? 'Uploading...' : 'Add Photo'}
+                  </span>
+                </button>
+              )}
+            </div>
 
             {imageUrls.length < 5 && (
               <p className="text-xs text-gray-500 mt-2">
-                You can add up to {5 - imageUrls.length} more {imageUrls.length < 4 ? 'images' : 'image'}
+                Upload up to {5 - imageUrls.length} more {5 - imageUrls.length === 1 ? 'image' : 'images'} (JPEG, PNG, WebP — max 5MB each)
               </p>
             )}
           </div>
 
           {/* Submit Button */}
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button type="submit" className="w-full" disabled={loading || uploading}>
             {loading ? 'Submitting...' : submitLabel}
           </Button>
         </form>
