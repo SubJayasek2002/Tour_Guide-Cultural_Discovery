@@ -35,6 +35,7 @@ export interface Review {
   destinationTitle?: string;
   userId: string;
   username: string;
+  userProfileImageUrl?: string;
   rate: number;
   review: string;
   imageUrls?: string[];
