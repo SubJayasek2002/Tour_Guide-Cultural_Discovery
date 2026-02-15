@@ -6,8 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { usersAPI } from '@/services/api';
 import { useAuth } from '@/contexts/AuthContext';
-import { User, MapPin, Calendar, Mail, Phone, Camera, Save, ArrowLeft, Lock, Heart, Image, Pencil } from 'lucide-react';
+import { User, MapPin, Calendar, Mail, Phone, Camera, Save, ArrowLeft, Lock, Heart, Image, Pencil, Loader2 } from 'lucide-react';
 import Footer from '@/components/shared/Footer';
+
+const API_BASE_URL = 'http://localhost:8081/api';
 
 type Destination = {
   id: string;
@@ -35,7 +37,7 @@ export default function UserProfile() {
   const [editEmail, setEditEmail] = useState('');
   const [editPhone, setEditPhone] = useState('');
   const [profileImageUrl, setProfileImageUrl] = useState('');
-  const [showImageInput, setShowImageInput] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [saving, setSaving] = useState(false);
@@ -71,12 +73,10 @@ export default function UserProfile() {
         lastName: editLastName,
         email: editEmail,
         phoneNumber: editPhone,
-        profileImageUrl: profileImageUrl || undefined,
       });
       await refreshUser();
       await fetchProfile();
       setMessage({ type: 'success', text: 'Profile updated successfully!' });
-      setShowImageInput(false);
     } catch (err: any) {
       setMessage({ type: 'error', text: err.message || 'Failed to update profile' });
     } finally {
@@ -93,6 +93,43 @@ export default function UserProfile() {
       setMessage({ type: 'success', text: 'Password changed successfully!' });
     } catch (err: any) {
       setMessage({ type: 'error', text: err.message || 'Failed to change password' });
+    }
+  }
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setMessage({ type: 'error', text: 'Please select an image file (JPG, PNG, etc.)' });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setMessage({ type: 'error', text: 'Image must be less than 5MB' });
+      return;
+    }
+
+    setUploadingImage(true);
+    setMessage(null);
+    try {
+      const result = await usersAPI.uploadProfileImage(file);
+      const fullUrl = `${API_BASE_URL.replace('/api', '')}${result.imageUrl}`;
+      setProfileImageUrl(fullUrl);
+
+      // Auto-save profile image
+      await usersAPI.updateMe({ profileImageUrl: fullUrl });
+      await refreshUser();
+      await fetchProfile();
+      setMessage({ type: 'success', text: 'Profile image updated successfully!' });
+    } catch (err: any) {
+      setMessage({ type: 'error', text: err.message || 'Failed to upload image' });
+    } finally {
+      setUploadingImage(false);
+      // Reset the input so the same file can be selected again
+      e.target.value = '';
     }
   }
 
@@ -157,13 +194,27 @@ export default function UserProfile() {
                     <User className="h-12 w-12 text-white" />
                   </div>
                 )}
-                <button
-                  onClick={() => setShowImageInput(!showImageInput)}
-                  className="absolute -bottom-1 -right-1 z-10 h-9 w-9 rounded-full bg-white shadow-lg flex items-center justify-center hover:bg-emerald-50 transition-all border-2 border-emerald-400 ring-2 ring-white"
+                <label
+                  htmlFor="profile-image-upload"
+                  className="absolute -bottom-1 -right-1 z-10 h-9 w-9 rounded-full bg-white shadow-lg flex items-center justify-center hover:bg-emerald-50 transition-all border-2 border-emerald-400 ring-2 ring-white cursor-pointer"
                 >
-                  <Camera className="h-4 w-4 text-emerald-600" />
-                  <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-emerald-500 text-white text-[10px] font-bold flex items-center justify-center leading-none shadow">+</span>
-                </button>
+                  {uploadingImage ? (
+                    <Loader2 className="h-4 w-4 text-emerald-600 animate-spin" />
+                  ) : (
+                    <>
+                      <Camera className="h-4 w-4 text-emerald-600" />
+                      <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-emerald-500 text-white text-[10px] font-bold flex items-center justify-center leading-none shadow">+</span>
+                    </>
+                  )}
+                </label>
+                <input
+                  id="profile-image-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImageUpload}
+                  disabled={uploadingImage}
+                />
               </div>
             </div>
           </div>
@@ -179,19 +230,13 @@ export default function UserProfile() {
               ))}
             </div>
 
-            {/* Image URL input */}
-            {showImageInput && (
+            {/* Upload status */}
+            {uploadingImage && (
               <div className="mt-4 max-w-sm mx-auto">
-                <label className="block text-sm font-medium text-gray-600 mb-1 text-left">Profile Image URL</label>
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="https://example.com/photo.jpg"
-                    value={profileImageUrl}
-                    onChange={(e) => setProfileImageUrl(e.target.value)}
-                    className="flex-1 border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500"
-                  />
+                <div className="flex items-center justify-center gap-2 text-sm text-emerald-600">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Uploading image...</span>
                 </div>
-                <p className="text-xs text-gray-400 mt-1 text-left">Paste the URL of your profile picture</p>
               </div>
             )}
           </CardContent>

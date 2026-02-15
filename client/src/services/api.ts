@@ -129,6 +129,22 @@ export const usersAPI = {
       body: JSON.stringify(data),
     }),
 
+  uploadProfileImage: async (file: File): Promise<{ imageUrl: string }> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const token = getAuthToken();
+    const response = await fetch(`${API_BASE_URL}/upload/profile-image`, {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: formData,
+    });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ message: 'Upload failed' }));
+      throw new Error(error.message || 'Upload failed');
+    }
+    return response.json();
+  },
+
   changePassword: (data: { currentPassword: string; newPassword: string }) =>
     apiRequest('/users/me/password', {
       method: 'PATCH',
