@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react';
-import { destinationsAPI } from '@/services/api';
+import { useEffect, useState, useRef } from 'react';
+import { destinationsAPI, uploadAPI } from '@/services/api';
 import type { Destination } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
-import { Plus, Edit, Trash2, X, MapPin, Search } from 'lucide-react';
+import { Plus, Edit, Trash2, X, MapPin, Search, Upload, Loader2 } from 'lucide-react';
 import MapPicker from '@/components/shared/MapPicker';
 import {
   Dialog,
@@ -43,6 +43,31 @@ export default function ManageDestinations() {
     imageUrls: [] as string[],
   });
   const [newImageUrl, setNewImageUrl] = useState('');
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploadingImage(true);
+    try {
+      for (const file of Array.from(files)) {
+        if (!file.type.startsWith('image/')) continue;
+        const result = await uploadAPI.uploadImage(file);
+        const fullUrl = `http://localhost:8081${result.imageUrl}`;
+        setFormData((prev) => ({
+          ...prev,
+          imageUrls: [...prev.imageUrls, fullUrl],
+        }));
+      }
+    } catch (error: any) {
+      alert(error.message || 'Failed to upload image');
+    } finally {
+      setUploadingImage(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
 
   useEffect(() => {
     fetchDestinations();
@@ -305,6 +330,31 @@ export default function ManageDestinations() {
                 <Button type="button" variant="outline" onClick={handleAddImage}>
                   Add
                 </Button>
+              </div>
+              <div className="flex items-center gap-3 mb-3">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={handleFileUpload}
+                  disabled={uploadingImage}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingImage}
+                  className="flex items-center gap-2"
+                >
+                  {uploadingImage ? (
+                    <><Loader2 className="h-4 w-4 animate-spin" /> Uploading...</>
+                  ) : (
+                    <><Upload className="h-4 w-4" /> Upload from Device</>
+                  )}
+                </Button>
+                <span className="text-xs text-gray-400">or paste a URL above</span>
               </div>
 
               {formData.imageUrls.length > 0 && (
