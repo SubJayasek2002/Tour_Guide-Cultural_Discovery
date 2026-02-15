@@ -122,7 +122,7 @@ export const usersAPI = {
   getMyProfile: () =>
     apiRequest('/users/me/profile', { headers: getAuthHeaders() }),
 
-  updateMe: (data: { fullName?: string; email?: string }) =>
+  updateMe: (data: { firstName?: string; lastName?: string; email?: string; phoneNumber?: string; profileImageUrl?: string }) =>
     apiRequest('/users/me', {
       method: 'PUT',
       headers: getAuthHeaders(),

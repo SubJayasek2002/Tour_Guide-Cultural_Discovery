@@ -46,6 +46,8 @@ public class User {
     
     private Set<Role> roles = new HashSet<>();
     
+    private String profileImageUrl;
+
     private Set<ObjectId> favoriteDestinationIds = new HashSet<>();
 
     private Set<ObjectId> favoriteEventIds = new HashSet<>();

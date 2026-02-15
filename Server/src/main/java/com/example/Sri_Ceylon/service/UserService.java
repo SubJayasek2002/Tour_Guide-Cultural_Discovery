@@ -88,6 +88,10 @@ public class UserService {
         if (updateRequest.getPhoneNumber() != null) {
             user.setPhoneNumber(updateRequest.getPhoneNumber());
         }
+
+        if (updateRequest.getProfileImageUrl() != null) {
+            user.setProfileImageUrl(updateRequest.getProfileImageUrl());
+        }
         
         user.setUpdatedAt(LocalDateTime.now());
         User updatedUser = userRepository.save(user);
@@ -210,15 +214,25 @@ public class UserService {
         if (destDocs != null) {
             for (Document d : destDocs) {
                 DestinationResponse r = new DestinationResponse();
-                r.setId(d.getString("_id") != null ? d.getString("_id") : d.get("_id").toString());
+                Object idObj = d.get("_id");
+                if (idObj instanceof ObjectId) {
+                    r.setId(((ObjectId) idObj).toHexString());
+                } else if (idObj != null) {
+                    r.setId(idObj.toString());
+                }
                 r.setTitle(d.getString("title"));
                 r.setDescription(d.getString("description"));
                 r.setImageUrls((List<String>) d.get("imageUrls"));
                 r.setBestSeasonToVisit(d.getString("bestSeasonToVisit"));
                 r.setLocation(d.getString("location"));
-                r.setLatitude(d.getDouble("latitude"));
-                r.setLongitude(d.getDouble("longitude"));
-                r.setTimestamp((java.time.LocalDateTime) d.get("timestamp"));
+                Object latObj = d.get("latitude");
+                if (latObj instanceof Number) r.setLatitude(((Number) latObj).doubleValue());
+                Object lonObj = d.get("longitude");
+                if (lonObj instanceof Number) r.setLongitude(((Number) lonObj).doubleValue());
+                Object tsObj = d.get("timestamp");
+                if (tsObj instanceof java.util.Date) {
+                    r.setTimestamp(((java.util.Date) tsObj).toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime());
+                }
                 // createdBy is a DBRef; aggregation may include it as a Document or DBRef; skip for now
                 destResponses.add(r);
             }
@@ -229,7 +243,12 @@ public class UserService {
         if (eventDocs != null) {
             for (Document e : eventDocs) {
                 EventResponse r = new EventResponse();
-                r.setId(e.getString("_id") != null ? e.getString("_id") : e.get("_id").toString());
+                Object eidObj = e.get("_id");
+                if (eidObj instanceof ObjectId) {
+                    r.setId(((ObjectId) eidObj).toHexString());
+                } else if (eidObj != null) {
+                    r.setId(eidObj.toString());
+                }
                 r.setTitle(e.getString("title"));
                 r.setDescription(e.getString("description"));
                 r.setImageUrls((List<String>) e.get("imageUrls"));
@@ -243,9 +262,14 @@ public class UserService {
                     r.setEnd(((java.util.Date) endObj).toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime());
                 }
                 r.setLocation(e.getString("location"));
-                r.setLatitude(e.getDouble("latitude"));
-                r.setLongitude(e.getDouble("longitude"));
-                r.setTimestamp((java.time.LocalDateTime) e.get("timestamp"));
+                Object elatObj = e.get("latitude");
+                if (elatObj instanceof Number) r.setLatitude(((Number) elatObj).doubleValue());
+                Object elonObj = e.get("longitude");
+                if (elonObj instanceof Number) r.setLongitude(((Number) elonObj).doubleValue());
+                Object etsObj = e.get("timestamp");
+                if (etsObj instanceof java.util.Date) {
+                    r.setTimestamp(((java.util.Date) etsObj).toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime());
+                }
                 eventResponses.add(r);
             }
         }
@@ -279,6 +303,7 @@ public class UserService {
         response.setFirstName(user.getFirstName());
         response.setLastName(user.getLastName());
         response.setPhoneNumber(user.getPhoneNumber());
+        response.setProfileImageUrl(user.getProfileImageUrl());
         response.setRoles(user.getRoles().stream()
                 .map(Role::name)
                 .collect(Collectors.toSet()));
