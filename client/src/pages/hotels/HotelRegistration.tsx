@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,7 +23,7 @@ import {
   CreditCard,
   Building
 } from 'lucide-react';
-import { hotelsAPI } from '@/services/api';
+import { hotelsAPI, usersAPI } from '@/services/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
@@ -76,6 +76,9 @@ const HotelRegistration = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [newPhone, setNewPhone] = useState('');
   const [newImageUrl, setNewImageUrl] = useState('');
+  const [uploadingImages, setUploadingImages] = useState(false);
+  const [localPreviews, setLocalPreviews] = useState<string[]>([]);
+  const previewUrlsRef = useRef<string[]>([]);
   
   const [formData, setFormData] = useState<HotelFormData>({
     name: '',
@@ -123,6 +126,54 @@ const HotelRegistration = () => {
       setNewImageUrl('');
     }
   };
+
+  const handleFilesSelected = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setUploadingImages(true);
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const tempUrl = URL.createObjectURL(file);
+        previewUrlsRef.current.push(tempUrl);
+        setLocalPreviews((p) => [...p, tempUrl]);
+        if (!(file.type === 'image/jpeg' || file.type === 'image/png')) {
+          toast.error(`${file.name} is not a supported image type (JPEG/PNG) and was skipped.`);
+          setLocalPreviews((p) => p.filter((u) => u !== tempUrl));
+          previewUrlsRef.current = previewUrlsRef.current.filter((u) => u !== tempUrl);
+          continue;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+          toast.error(`${file.name} exceeds 5MB and was skipped.`);
+          setLocalPreviews((p) => p.filter((u) => u !== tempUrl));
+          previewUrlsRef.current = previewUrlsRef.current.filter((u) => u !== tempUrl);
+          continue;
+        }
+        try {
+          const res = await usersAPI.uploadProfileImage(file);
+          if (res?.imageUrl) {
+            setFormData(prev => ({ ...prev, imageUrls: [...prev.imageUrls, res.imageUrl] }));
+            setLocalPreviews((p) => p.filter((u) => u !== tempUrl));
+            previewUrlsRef.current = previewUrlsRef.current.filter((u) => u !== tempUrl);
+          }
+        } catch (err: any) {
+          console.error('Upload failed for', file.name, err);
+          toast.error(`Failed to upload ${file.name}`);
+          setLocalPreviews((p) => p.filter((u) => u !== tempUrl));
+          previewUrlsRef.current = previewUrlsRef.current.filter((u) => u !== tempUrl);
+        }
+      }
+    } finally {
+      setUploadingImages(false);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      previewUrlsRef.current.forEach((u) => URL.revokeObjectURL(u));
+      previewUrlsRef.current = [];
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const removeImageUrl = (url: string) => {
     setFormData(prev => ({ ...prev, imageUrls: prev.imageUrls.filter(u => u !== url) }));
@@ -440,21 +491,36 @@ const HotelRegistration = () => {
             <CardDescription>Add image URLs to showcase your hotel</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex gap-2">
-              <Input
-                placeholder="Paste image URL here..."
-                value={newImageUrl}
-                onChange={(e) => setNewImageUrl(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    addImageUrl();
-                  }
-                }}
-              />
-              <Button type="button" variant="outline" onClick={addImageUrl}>
-                <Plus className="h-4 w-4" />
-              </Button>
+            <div className="flex flex-col gap-3">
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Paste image URL here..."
+                  value={newImageUrl}
+                  onChange={(e) => setNewImageUrl(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      addImageUrl();
+                    }
+                  }}
+                />
+                <Button type="button" variant="outline" onClick={addImageUrl}>
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="flex items-center gap-3">
+                <label className="cursor-pointer inline-flex items-center gap-2 px-3 py-2 border rounded-md bg-white text-sm">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) => handleFilesSelected(e.target.files)}
+                    className="hidden"
+                  />
+                  Upload from device
+                </label>
+                {uploadingImages && <div className="text-sm text-gray-500">Uploading...</div>}
+              </div>
             </div>
             {formData.imageUrls.length > 0 && (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -477,6 +543,20 @@ const HotelRegistration = () => {
                     </button>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {localPreviews.length > 0 && (
+              <div className="mt-3">
+                <div className="text-sm text-gray-600 mb-2">Preview(s)</div>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {localPreviews.map((p) => (
+                    <div key={p} className="relative group rounded overflow-hidden border bg-gray-50 flex items-center justify-center">
+                      <img src={p} alt="preview" className="w-full h-32 object-cover" />
+                      <div className="absolute bottom-1 left-1 bg-black/50 text-white text-xs px-2 py-1 rounded">Uploading...</div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </CardContent>

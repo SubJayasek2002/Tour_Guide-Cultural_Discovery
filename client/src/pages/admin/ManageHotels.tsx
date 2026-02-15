@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { hotelsAPI } from '@/services/api';
+import { useEffect, useState, useRef } from 'react';
+import { hotelsAPI, usersAPI } from '@/services/api';
 import type { Hotel } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -57,6 +57,9 @@ export default function ManageHotels() {
     longitude: undefined as number | undefined,
   });
   const [newImageUrl, setNewImageUrl] = useState('');
+  const [uploadingImages, setUploadingImages] = useState(false);
+  const [localPreviews, setLocalPreviews] = useState<string[]>([]);
+  const previewUrlsRef = useRef<string[]>([]);
   const [newPhone, setNewPhone] = useState('');
   const [newAmenity, setNewAmenity] = useState('');
 
@@ -125,6 +128,55 @@ export default function ManageHotels() {
       setNewImageUrl('');
     }
   };
+
+  const handleFilesSelected = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setUploadingImages(true);
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const tempUrl = URL.createObjectURL(file);
+        previewUrlsRef.current.push(tempUrl);
+        setLocalPreviews((p) => [...p, tempUrl]);
+        // Basic client-side validation — allow only JPEG and PNG
+        if (!(file.type === 'image/jpeg' || file.type === 'image/png')) {
+          alert(`${file.name} is not a supported image type (JPEG/PNG) and will be skipped.`);
+          // remove preview
+          setLocalPreviews((p) => p.filter((u) => u !== tempUrl));
+          continue;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+          alert(`${file.name} is larger than 5MB and will be skipped.`);
+          setLocalPreviews((p) => p.filter((u) => u !== tempUrl));
+          continue;
+        }
+        try {
+          const res = await usersAPI.uploadProfileImage(file);
+          if (res?.imageUrl) {
+            setFormData((prev) => ({ ...prev, imageUrls: [...prev.imageUrls, res.imageUrl] }));
+            // remove preview from list (do not revoke immediately)
+            setLocalPreviews((p) => p.filter((u) => u !== tempUrl));
+            previewUrlsRef.current = previewUrlsRef.current.filter((u) => u !== tempUrl);
+          }
+        } catch (err: any) {
+          console.error('Upload failed for', file.name, err);
+          alert(`Failed to upload ${file.name}: ${err?.message || err}`);
+          setLocalPreviews((p) => p.filter((u) => u !== tempUrl));
+          previewUrlsRef.current = previewUrlsRef.current.filter((u) => u !== tempUrl);
+        }
+      }
+    } finally {
+      setUploadingImages(false);
+    }
+  };
+
+  // cleanup object URLs on unmount
+  useEffect(() => {
+    return () => {
+      previewUrlsRef.current.forEach((u) => URL.revokeObjectURL(u));
+      previewUrlsRef.current = [];
+    };
+  }, []);
 
   const handleRemoveImage = (index: number) => {
     setFormData((prev) => ({
@@ -536,16 +588,31 @@ export default function ManageHotels() {
 
             <div>
               <Label>Images</Label>
-              <div className="flex gap-2 mb-3">
-                <Input
-                  type="url"
-                  placeholder="Enter image URL"
-                  value={newImageUrl}
-                  onChange={(e) => setNewImageUrl(e.target.value)}
-                />
-                <Button type="button" variant="outline" onClick={handleAddImage}>
-                  Add
-                </Button>
+              <div className="flex flex-col gap-3 mb-3">
+                <div className="flex gap-2">
+                  <Input
+                    type="url"
+                    placeholder="Enter image URL"
+                    value={newImageUrl}
+                    onChange={(e) => setNewImageUrl(e.target.value)}
+                  />
+                  <Button type="button" variant="outline" onClick={handleAddImage}>
+                    Add
+                  </Button>
+                </div>
+                <div className="flex items-center gap-3">
+                  <label className="cursor-pointer inline-flex items-center gap-2 px-3 py-2 border rounded-md bg-white text-sm">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) => handleFilesSelected(e.target.files)}
+                      className="hidden"
+                    />
+                    Upload from device
+                  </label>
+                  {uploadingImages && <div className="text-sm text-gray-500">Uploading...</div>}
+                </div>
               </div>
 
               {formData.imageUrls.length > 0 && (
@@ -562,6 +629,19 @@ export default function ManageHotels() {
                       </button>
                     </div>
                   ))}
+                </div>
+              )}
+              {localPreviews.length > 0 && (
+                <div className="mt-3">
+                  <div className="text-sm text-gray-600 mb-2">Preview(s)</div>
+                  <div className="grid grid-cols-4 gap-2">
+                    {localPreviews.map((p) => (
+                      <div key={p} className="relative aspect-square rounded overflow-hidden border bg-gray-50 flex items-center justify-center">
+                        <img src={p} alt="preview" className="w-full h-full object-cover" />
+                        <div className="absolute bottom-1 left-1 bg-black/50 text-white text-xs px-2 py-1 rounded">Uploading...</div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>

@@ -279,7 +279,7 @@ export default function Home() {
               </Link>
             </Button>
             <p className="mt-6 text-sm text-cyan-200/70">
-              Free to list ΓÇó Get discovered by travelers worldwide
+              Free to list and get discovered by travelers worldwide
             </p>
           </div>
         </div>
