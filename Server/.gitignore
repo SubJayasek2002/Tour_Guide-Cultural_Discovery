@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+##Adding application.properties to .gitignore to prevent sensitive information from being committed to the repository
+application.properties

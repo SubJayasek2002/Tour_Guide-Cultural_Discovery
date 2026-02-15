@@ -1,0 +1,852 @@
+{
+  "info": {
+    "name": "Hotel Management API Tests",
+    "description": "Comprehensive Postman collection for testing Hotel Management endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Admin Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin_password\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Authenticate as admin user and get JWT token"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Public Endpoints",
+      "item": [
+        {
+          "name": "Get All Hotels",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hotels",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hotels"
+              ]
+            },
+            "description": "Retrieve all hotels in the database"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Hotel by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hotels/{{hotel_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hotels",
+                "{{hotel_id}}"
+              ]
+            },
+            "description": "Get details of a specific hotel by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Nearby Hotels - Colombo",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hotels/near?lat=6.9271&lng=80.7744&radiusKm=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hotels",
+                "near"
+              ],
+              "query": [
+                {
+                  "key": "lat",
+                  "value": "6.9271"
+                },
+                {
+                  "key": "lng",
+                  "value": "80.7744"
+                },
+                {
+                  "key": "radiusKm",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Find hotels near Colombo within 10km radius"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Nearby Hotels - Kandy",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hotels/near?lat=7.2906&lng=80.6337&radiusKm=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hotels",
+                "near"
+              ],
+              "query": [
+                {
+                  "key": "lat",
+                  "value": "7.2906"
+                },
+                {
+                  "key": "lng",
+                  "value": "80.6337"
+                },
+                {
+                  "key": "radiusKm",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Find hotels near Kandy within 10km radius"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Nearby Hotels - Galle",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hotels/near?lat=6.0535&lng=80.2210&radiusKm=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hotels",
+                "near"
+              ],
+              "query": [
+                {
+                  "key": "lat",
+                  "value": "6.0535"
+                },
+                {
+                  "key": "lng",
+                  "value": "80.2210"
+                },
+                {
+                  "key": "radiusKm",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Find hotels near Galle within 10km radius"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin Endpoints",
+      "item": [
+        {
+          "name": "Create Hotel - Full Details",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"The Grand Hotel\",\n  \"description\": \"Luxury 5-star hotel in the heart of the city with world-class amenities\",\n  \"address\": \"123 Main Street, Colombo, Sri Lanka\",\n  \"phones\": [\"+94112345678\", \"+94112345679\"],\n  \"whatsapp\": \"+94712345678\",\n  \"email\": \"info@grandhotel.lk\",\n  \"website\": \"https://www.grandhotel.lk\",\n  \"amenities\": [\"WiFi\", \"Swimming Pool\", \"Gym\", \"Restaurant\", \"Spa\", \"Concierge\"],\n  \"imageUrls\": [\n    \"https://example.com/hotel1.jpg\",\n    \"https://example.com/hotel2.jpg\",\n    \"https://example.com/hotel3.jpg\"\n  ],\n  \"latitude\": 6.9271,\n  \"longitude\": 80.7744\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/hotels",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hotels"
+              ]
+            },
+            "description": "Create a new hotel with all details"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Hotel - Kandy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Kandy Serena Hotel\",\n  \"description\": \"Luxury resort overlooking the Lake\",\n  \"address\": \"Annex Street, Kandy, Sri Lanka\",\n  \"phones\": [\"+94812223601\"],\n  \"whatsapp\": \"+94702223601\",\n  \"email\": \"info@kandyserena.lk\",\n  \"website\": \"https://www.kandyserena.lk\",\n  \"amenities\": [\"Lake View\", \"Restaurant\", \"Spa\", \"Cultural Tours\", \"WiFi\"],\n  \"imageUrls\": [\n    \"https://example.com/kandy1.jpg\",\n    \"https://example.com/kandy2.jpg\"\n  ],\n  \"latitude\": 7.2906,\n  \"longitude\": 80.6337\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/hotels",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hotels"
+              ]
+            },
+            "description": "Create a new hotel in Kandy"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Hotel - Minimal (Required Fields Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Simple Hotel\",\n  \"description\": \"A basic hotel\",\n  \"address\": \"456 Side Street, Colombo\",\n  \"amenities\": [\"WiFi\", \"Restaurant\"],\n  \"imageUrls\": [\"https://example.com/simple.jpg\"],\n  \"latitude\": 6.9271,\n  \"longitude\": 80.7744\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/hotels",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hotels"
+              ]
+            },
+            "description": "Create hotel with only required fields"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Hotel - Full",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Grand Hotel\",\n  \"description\": \"Updated luxury 5-star hotel with enhanced amenities\",\n  \"address\": \"123 Updated Main Street, Colombo, Sri Lanka\",\n  \"phones\": [\"+94112233445\"],\n  \"whatsapp\": \"+94701122334\",\n  \"email\": \"updated@grandhotel.lk\",\n  \"website\": \"https://www.updatedgrandhotel.lk\",\n  \"amenities\": [\"WiFi\", \"Swimming Pool\", \"Gym\", \"Restaurant\", \"Spa\", \"Conference Hall\", \"Rooftop Bar\"],\n  \"imageUrls\": [\n    \"https://example.com/updated1.jpg\",\n    \"https://example.com/updated2.jpg\"\n  ],\n  \"latitude\": 6.9280,\n  \"longitude\": 80.7750,\n  \"isPaid\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/hotels/{{hotel_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hotels",
+                "{{hotel_id}}"
+              ]
+            },
+            "description": "Update all fields of a hotel"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Hotel - Partial",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Partially Updated Hotel\",\n  \"email\": \"newemail@hotel.lk\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/hotels/{{hotel_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hotels",
+                "{{hotel_id}}"
+              ]
+            },
+            "description": "Update only specific fields of a hotel"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Hotel - Mark as Paid",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isPaid\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/hotels/{{hotel_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hotels",
+                "{{hotel_id}}"
+              ]
+            },
+            "description": "Mark hotel listing as paid"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Hotel",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hotels/{{hotel_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hotels",
+                "{{hotel_id}}"
+              ]
+            },
+            "description": "Delete a hotel by ID"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Testing Workflows",
+      "item": [
+        {
+          "name": "Workflow 1 - Step 1: Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin_password\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Step 1: Authenticate and get token"
+          },
+          "response": []
+        },
+        {
+          "name": "Workflow 1 - Step 2: Create Hotel",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Workflow Test Hotel\",\n  \"description\": \"Hotel created for workflow testing\",\n  \"address\": \"999 Test Street, Colombo\",\n  \"phones\": [\"+94119999999\"],\n  \"amenities\": [\"WiFi\", \"Restaurant\"],\n  \"imageUrls\": [\"https://example.com/test.jpg\"],\n  \"latitude\": 6.9271,\n  \"longitude\": 80.7744\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/hotels",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hotels"
+              ]
+            },
+            "description": "Step 2: Create a new hotel"
+          },
+          "response": []
+        },
+        {
+          "name": "Workflow 1 - Step 3: Get All Hotels",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hotels",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hotels"
+              ]
+            },
+            "description": "Step 3: Verify hotel appears in list"
+          },
+          "response": []
+        },
+        {
+          "name": "Workflow 1 - Step 4: Get Specific Hotel",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hotels/{{hotel_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hotels",
+                "{{hotel_id}}"
+              ]
+            },
+            "description": "Step 4: Get details of created hotel"
+          },
+          "response": []
+        },
+        {
+          "name": "Workflow 1 - Step 5: Update Hotel",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Workflow Hotel\",\n  \"isPaid\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/hotels/{{hotel_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hotels",
+                "{{hotel_id}}"
+              ]
+            },
+            "description": "Step 5: Update hotel details"
+          },
+          "response": []
+        },
+        {
+          "name": "Workflow 1 - Step 6: Find Nearby Hotels",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hotels/near?lat=6.9271&lng=80.7744&radiusKm=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hotels",
+                "near"
+              ],
+              "query": [
+                {
+                  "key": "lat",
+                  "value": "6.9271"
+                },
+                {
+                  "key": "lng",
+                  "value": "80.7744"
+                },
+                {
+                  "key": "radiusKm",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Step 6: Verify hotel appears in nearby search"
+          },
+          "response": []
+        },
+        {
+          "name": "Workflow 1 - Step 7: Delete Hotel",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hotels/{{hotel_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hotels",
+                "{{hotel_id}}"
+              ]
+            },
+            "description": "Step 7: Delete the hotel"
+          },
+          "response": []
+        },
+        {
+          "name": "Workflow 1 - Step 8: Verify Deletion",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hotels/{{hotel_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hotels",
+                "{{hotel_id}}"
+              ]
+            },
+            "description": "Step 8: Verify hotel is deleted (should return 404)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Error Testing",
+      "item": [
+        {
+          "name": "Create Hotel - Missing Name",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Missing name field\",\n  \"address\": \"123 Street\",\n  \"amenities\": [\"WiFi\"],\n  \"imageUrls\": [\"https://example.com/image.jpg\"],\n  \"latitude\": 6.9271,\n  \"longitude\": 80.7744\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/hotels",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hotels"
+              ]
+            },
+            "description": "Should return 400 Bad Request"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Hotel - Missing Coordinates",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"No Coordinates Hotel\",\n  \"description\": \"Missing latitude and longitude\",\n  \"address\": \"123 Street\",\n  \"amenities\": [\"WiFi\"],\n  \"imageUrls\": [\"https://example.com/image.jpg\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/hotels",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hotels"
+              ]
+            },
+            "description": "Should return 400 Bad Request"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Hotel - No Authentication",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"No Auth Hotel\",\n  \"description\": \"Missing authentication token\",\n  \"address\": \"123 Street\",\n  \"amenities\": [\"WiFi\"],\n  \"imageUrls\": [\"https://example.com/image.jpg\"],\n  \"latitude\": 6.9271,\n  \"longitude\": 80.7744\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/hotels",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hotels"
+              ]
+            },
+            "description": "Should return 401 Unauthorized"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Hotel - Invalid ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hotels/invalid_id_12345",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hotels",
+                "invalid_id_12345"
+              ]
+            },
+            "description": "Should return 404 Not Found"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Hotel - Invalid ID",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hotels/invalid_id_12345",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hotels",
+                "invalid_id_12345"
+              ]
+            },
+            "description": "Should return 404 Not Found"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "admin_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "hotel_id",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

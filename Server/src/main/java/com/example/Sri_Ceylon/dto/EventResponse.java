@@ -11,6 +11,8 @@ public class EventResponse {
     private LocalDateTime start;
     private LocalDateTime end;
     private String location;
+    private Double latitude;
+    private Double longitude;
     private LocalDateTime timestamp;
     private String createdById;
     private String createdByUsername;
@@ -19,7 +21,7 @@ public class EventResponse {
     public EventResponse() {}
 
     public EventResponse(String id, String title, String description, List<String> imageUrls,
-                        LocalDateTime start, LocalDateTime end, String location, 
+                        LocalDateTime start, LocalDateTime end, String location, Double latitude, Double longitude,
                         LocalDateTime timestamp,
                         String createdById, String createdByUsername) {
         this.id = id;
@@ -29,6 +31,8 @@ public class EventResponse {
         this.start = start;
         this.end = end;
         this.location = location;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.timestamp = timestamp;
         this.createdById = createdById;
         this.createdByUsername = createdByUsername;
@@ -89,6 +93,22 @@ public class EventResponse {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
     }
 
     public LocalDateTime getTimestamp() {

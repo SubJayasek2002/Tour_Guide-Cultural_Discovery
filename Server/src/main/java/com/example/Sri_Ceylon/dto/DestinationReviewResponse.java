@@ -1,0 +1,101 @@
+package com.example.Sri_Ceylon.dto;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+public class DestinationReviewResponse {
+    private String id;
+    private String destinationId;
+    private String destinationTitle;
+    private String userId;
+    private String username;
+    private String userProfileImageUrl;
+    private Integer rate;
+    private String review;
+    private List<String> imageUrls;
+    private LocalDateTime timestamp;
+
+    // Constructors
+    public DestinationReviewResponse() {}
+
+    // Getters and Setters
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getDestinationId() {
+        return destinationId;
+    }
+
+    public void setDestinationId(String destinationId) {
+        this.destinationId = destinationId;
+    }
+
+    public String getDestinationTitle() {
+        return destinationTitle;
+    }
+
+    public void setDestinationTitle(String destinationTitle) {
+        this.destinationTitle = destinationTitle;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getUserProfileImageUrl() {
+        return userProfileImageUrl;
+    }
+
+    public void setUserProfileImageUrl(String userProfileImageUrl) {
+        this.userProfileImageUrl = userProfileImageUrl;
+    }
+
+    public Integer getRate() {
+        return rate;
+    }
+
+    public void setRate(Integer rate) {
+        this.rate = rate;
+    }
+
+    public String getReview() {
+        return review;
+    }
+
+    public void setReview(String review) {
+        this.review = review;
+    }
+
+    public List<String> getImageUrls() {
+        return imageUrls;
+    }
+
+    public void setImageUrls(List<String> imageUrls) {
+        this.imageUrls = imageUrls;
+    }
+
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(LocalDateTime timestamp) {
+        this.timestamp = timestamp;
+    }
+}

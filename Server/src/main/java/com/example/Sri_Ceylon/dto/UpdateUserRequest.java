@@ -22,4 +22,6 @@ public class UpdateUserRequest {
     private String lastName;
     
     private String phoneNumber;
+
+    private String profileImageUrl;
 }
