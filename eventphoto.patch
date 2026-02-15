@@ -1,0 +1,296 @@
+diff --git a/Server/src/main/java/com/example/Sri_Ceylon/controller/FileUploadController.java b/Server/src/main/java/com/example/Sri_Ceylon/controller/FileUploadController.java
+index 7ecfed3..3e07470 100644
+--- a/Server/src/main/java/com/example/Sri_Ceylon/controller/FileUploadController.java
++++ b/Server/src/main/java/com/example/Sri_Ceylon/controller/FileUploadController.java
+@@ -31,37 +31,34 @@ import jakarta.annotation.PostConstruct;
+ @CrossOrigin(origins = "*", maxAge = 3600)
+ public class FileUploadController {
+ 
+-    private final Path uploadDir = Paths.get("uploads/profile-images");
++    private final Path profileUploadDir = Paths.get("uploads/profile-images");
++    private final Path imageUploadDir = Paths.get("uploads/images");
+ 
+     @PostConstruct
+     public void init() {
+         try {
+-            Files.createDirectories(uploadDir);
++            Files.createDirectories(profileUploadDir);
++            Files.createDirectories(imageUploadDir);
+         } catch (IOException e) {
+-            throw new RuntimeException("Could not create upload directory!", e);
++            throw new RuntimeException("Could not create upload directories!", e);
+         }
+     }
+ 
+-    @PostMapping("/upload/profile-image")
+-    @PreAuthorize("isAuthenticated()")
+-    public ResponseEntity<Map<String, String>> uploadProfileImage(@RequestParam("file") MultipartFile file) {
++    private ResponseEntity<Map<String, String>> handleUpload(MultipartFile file, Path targetDir, String urlPrefix, long maxSizeMB) {
+         if (file.isEmpty()) {
+             return ResponseEntity.badRequest().body(Map.of("message", "Please select a file to upload"));
+         }
+ 
+-        // Validate file type
+         String contentType = file.getContentType();
+         if (contentType == null || !contentType.startsWith("image/")) {
+             return ResponseEntity.badRequest().body(Map.of("message", "Only image files are allowed"));
+         }
+ 
+-        // Validate file size (max 5MB)
+-        if (file.getSize() > 5 * 1024 * 1024) {
+-            return ResponseEntity.badRequest().body(Map.of("message", "File size must be less than 5MB"));
++        if (file.getSize() > maxSizeMB * 1024 * 1024) {
++            return ResponseEntity.badRequest().body(Map.of("message", "File size must be less than " + maxSizeMB + "MB"));
+         }
+ 
+         try {
+-            // Generate unique filename
+             String originalFilename = file.getOriginalFilename();
+             String extension = "";
+             if (originalFilename != null && originalFilename.contains(".")) {
+@@ -69,12 +66,10 @@ public class FileUploadController {
+             }
+             String filename = UUID.randomUUID().toString() + extension;
+ 
+-            // Save file
+-            Path filePath = uploadDir.resolve(filename);
++            Path filePath = targetDir.resolve(filename);
+             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+ 
+-            // Return the URL to access the file
+-            String imageUrl = "/api/uploads/profile-images/" + filename;
++            String imageUrl = urlPrefix + filename;
+             return ResponseEntity.ok(Map.of("imageUrl", imageUrl));
+ 
+         } catch (IOException e) {
+@@ -82,10 +77,31 @@ public class FileUploadController {
+         }
+     }
+ 
++    @PostMapping("/upload/profile-image")
++    @PreAuthorize("isAuthenticated()")
++    public ResponseEntity<Map<String, String>> uploadProfileImage(@RequestParam("file") MultipartFile file) {
++        return handleUpload(file, profileUploadDir, "/api/uploads/profile-images/", 5);
++    }
++
++    @PostMapping("/upload/image")
++    @PreAuthorize("isAuthenticated()")
++    public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file) {
++        return handleUpload(file, imageUploadDir, "/api/uploads/images/", 10);
++    }
++
++    @GetMapping("/uploads/images/{filename}")
++    public ResponseEntity<Resource> getImage(@PathVariable String filename) {
++        return serveFile(imageUploadDir, filename);
++    }
++
+     @GetMapping("/uploads/profile-images/{filename}")
+     public ResponseEntity<Resource> getProfileImage(@PathVariable String filename) {
++        return serveFile(profileUploadDir, filename);
++    }
++
++    private ResponseEntity<Resource> serveFile(Path directory, String filename) {
+         try {
+-            Path filePath = uploadDir.resolve(filename).normalize();
++            Path filePath = directory.resolve(filename).normalize();
+             Resource resource = new UrlResource(filePath.toUri());
+ 
+             if (!resource.exists() || !resource.isReadable()) {
+diff --git a/client/src/pages/admin/ManageDestinations.tsx b/client/src/pages/admin/ManageDestinations.tsx
+index c90e440..cbb0934 100644
+--- a/client/src/pages/admin/ManageDestinations.tsx
++++ b/client/src/pages/admin/ManageDestinations.tsx
+@@ -1,12 +1,12 @@
+-import { useEffect, useState } from 'react';
+-import { destinationsAPI } from '@/services/api';
++import { useEffect, useState, useRef } from 'react';
++import { destinationsAPI, uploadAPI } from '@/services/api';
+ import type { Destination } from '@/types';
+ import { Button } from '@/components/ui/button';
+ import { Input } from '@/components/ui/input';
+ import { Label } from '@/components/ui/label';
+ import { Textarea } from '@/components/ui/textarea';
+ import { Card, CardContent } from '@/components/ui/card';
+-import { Plus, Edit, Trash2, X, MapPin, Search } from 'lucide-react';
++import { Plus, Edit, Trash2, X, MapPin, Search, Upload, Loader2 } from 'lucide-react';
+ import MapPicker from '@/components/shared/MapPicker';
+ import {
+   Dialog,
+@@ -43,6 +43,31 @@ export default function ManageDestinations() {
+     imageUrls: [] as string[],
+   });
+   const [newImageUrl, setNewImageUrl] = useState('');
++  const [uploadingImage, setUploadingImage] = useState(false);
++  const fileInputRef = useRef<HTMLInputElement>(null);
++
++  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
++    const files = e.target.files;
++    if (!files || files.length === 0) return;
++
++    setUploadingImage(true);
++    try {
++      for (const file of Array.from(files)) {
++        if (!file.type.startsWith('image/')) continue;
++        const result = await uploadAPI.uploadImage(file);
++        const fullUrl = `http://localhost:8081${result.imageUrl}`;
++        setFormData((prev) => ({
++          ...prev,
++          imageUrls: [...prev.imageUrls, fullUrl],
++        }));
++      }
++    } catch (error: any) {
++      alert(error.message || 'Failed to upload image');
++    } finally {
++      setUploadingImage(false);
++      if (fileInputRef.current) fileInputRef.current.value = '';
++    }
++  };
+ 
+   useEffect(() => {
+     fetchDestinations();
+@@ -306,6 +331,31 @@ export default function ManageDestinations() {
+                   Add
+                 </Button>
+               </div>
++              <div className="flex items-center gap-3 mb-3">
++                <input
++                  ref={fileInputRef}
++                  type="file"
++                  accept="image/*"
++                  multiple
++                  className="hidden"
++                  onChange={handleFileUpload}
++                  disabled={uploadingImage}
++                />
++                <Button
++                  type="button"
++                  variant="outline"
++                  onClick={() => fileInputRef.current?.click()}
++                  disabled={uploadingImage}
++                  className="flex items-center gap-2"
++                >
++                  {uploadingImage ? (
++                    <><Loader2 className="h-4 w-4 animate-spin" /> Uploading...</>
++                  ) : (
++                    <><Upload className="h-4 w-4" /> Upload from Device</>
++                  )}
++                </Button>
++                <span className="text-xs text-gray-400">or paste a URL above</span>
++              </div>
+ 
+               {formData.imageUrls.length > 0 && (
+                 <div className="grid grid-cols-3 gap-2">
+diff --git a/client/src/pages/admin/ManageEvents.tsx b/client/src/pages/admin/ManageEvents.tsx
+index 8f81411..1d344d3 100644
+--- a/client/src/pages/admin/ManageEvents.tsx
++++ b/client/src/pages/admin/ManageEvents.tsx
+@@ -1,12 +1,12 @@
+-import { useEffect, useState } from 'react';
+-import { eventsAPI } from '@/services/api';
++import { useEffect, useState, useRef } from 'react';
++import { eventsAPI, uploadAPI } from '@/services/api';
+ import type { Event } from '@/types';
+ import { Button } from '@/components/ui/button';
+ import { Input } from '@/components/ui/input';
+ import { Label } from '@/components/ui/label';
+ import { Textarea } from '@/components/ui/textarea';
+ import { Card, CardContent } from '@/components/ui/card';
+-import { Plus, Edit, Trash2, X, Calendar, Search } from 'lucide-react';
++import { Plus, Edit, Trash2, X, Calendar, Search, Upload, Loader2 } from 'lucide-react';
+ import MapPicker from '@/components/shared/MapPicker';
+ import {
+   Dialog,
+@@ -44,6 +44,31 @@ export default function ManageEvents() {
+     imageUrls: [] as string[],
+   });
+   const [newImageUrl, setNewImageUrl] = useState('');
++  const [uploadingImage, setUploadingImage] = useState(false);
++  const fileInputRef = useRef<HTMLInputElement>(null);
++
++  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
++    const files = e.target.files;
++    if (!files || files.length === 0) return;
++
++    setUploadingImage(true);
++    try {
++      for (const file of Array.from(files)) {
++        if (!file.type.startsWith('image/')) continue;
++        const result = await uploadAPI.uploadImage(file);
++        const fullUrl = `http://localhost:8081${result.imageUrl}`;
++        setFormData((prev) => ({
++          ...prev,
++          imageUrls: [...prev.imageUrls, fullUrl],
++        }));
++      }
++    } catch (error: any) {
++      alert(error.message || 'Failed to upload image');
++    } finally {
++      setUploadingImage(false);
++      if (fileInputRef.current) fileInputRef.current.value = '';
++    }
++  };
+ 
+   useEffect(() => {
+     fetchEvents();
+@@ -317,6 +342,31 @@ export default function ManageEvents() {
+                   Add
+                 </Button>
+               </div>
++              <div className="flex items-center gap-3 mb-3">
++                <input
++                  ref={fileInputRef}
++                  type="file"
++                  accept="image/*"
++                  multiple
++                  className="hidden"
++                  onChange={handleFileUpload}
++                  disabled={uploadingImage}
++                />
++                <Button
++                  type="button"
++                  variant="outline"
++                  onClick={() => fileInputRef.current?.click()}
++                  disabled={uploadingImage}
++                  className="flex items-center gap-2"
++                >
++                  {uploadingImage ? (
++                    <><Loader2 className="h-4 w-4 animate-spin" /> Uploading...</>
++                  ) : (
++                    <><Upload className="h-4 w-4" /> Upload from Device</>
++                  )}
++                </Button>
++                <span className="text-xs text-gray-400">or paste a URL above</span>
++              </div>
+ 
+               {formData.imageUrls.length > 0 && (
+                 <div className="grid grid-cols-3 gap-2">
+diff --git a/client/src/services/api.ts b/client/src/services/api.ts
+index c0e8c06..a6238bf 100644
+--- a/client/src/services/api.ts
++++ b/client/src/services/api.ts
+@@ -153,6 +153,25 @@ export const usersAPI = {
+     }),
+ };
+ 
++// Upload API
++export const uploadAPI = {
++  uploadImage: async (file: File): Promise<{ imageUrl: string }> => {
++    const formData = new FormData();
++    formData.append('file', file);
++    const token = getAuthToken();
++    const response = await fetch(`${API_BASE_URL}/upload/image`, {
++      method: 'POST',
++      headers: token ? { Authorization: `Bearer ${token}` } : {},
++      body: formData,
++    });
++    if (!response.ok) {
++      const error = await response.json().catch(() => ({ message: 'Upload failed' }));
++      throw new Error(error.message || 'Upload failed');
++    }
++    return response.json();
++  },
++};
++
+ // Events API
+ export const eventsAPI = {
+   getAll: () => apiRequest('/events'),
