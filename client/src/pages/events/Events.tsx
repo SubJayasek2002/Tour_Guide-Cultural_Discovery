@@ -58,7 +58,6 @@ export default function Events() {
         setLoading(false);
       }
     };
-
     fetchEvents();
   }, []);
 
@@ -85,6 +84,19 @@ export default function Events() {
     }
   };
 
+  const getDistance = (lat1: number, lng1: number, lat2: number, lng2: number) => {
+    const R = 6371; // Radius of the Earth in km
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLng = ((lng2 - lng1) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos((lat1 * Math.PI) / 180) *
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLng / 2) ** 2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  };
+
   const handleMapSearch = (lat: number, lng: number, radius: number) => {
     const filtered = events.filter((event) => {
       if (!event.latitude || !event.longitude) return false;
@@ -94,20 +106,6 @@ export default function Events() {
     setFilteredByLocation(filtered);
     setHasLocationFilter(true);
     setIsMapSearchOpen(false);
-  };
-
-  const getDistance = (lat1: number, lng1: number, lat2: number, lng2: number) => {
-    const R = 6371; // Radius of the Earth in km
-    const dLat = ((lat2 - lat1) * Math.PI) / 180;
-    const dLng = ((lng2 - lng1) * Math.PI) / 180;
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos((lat1 * Math.PI) / 180) *
-        Math.cos((lat2 * Math.PI) / 180) *
-        Math.sin(dLng / 2) *
-        Math.sin(dLng / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
   };
 
   const handleClearFilters = () => {
@@ -136,14 +134,26 @@ export default function Events() {
   };
 
   // Filter events based on search query and location
-  const filteredEvents = useMemo(() => {
-    let results = hasLocationFilter ? filteredByLocation : events;
+  const { upcomingEvents, pastEvents } = useMemo(() => {
+    const now = new Date();
+    const source = hasLocationFilter ? filteredByLocation : events;
     const query = searchQuery.toLowerCase();
-    return results.filter((event) =>
+
+    const searched = source.filter((event) =>
       event.title.toLowerCase().includes(query) ||
       event.description?.toLowerCase().includes(query) ||
       event.location?.toLowerCase().includes(query)
     );
+
+    const upcomingEvents = searched
+      .filter((event) => event.start && new Date(event.start) >= now)
+      .sort((a, b) => new Date(a.start!).getTime() - new Date(b.start!).getTime());
+
+    const pastEvents = searched
+      .filter((event) => event.start && new Date(event.start) < now)
+      .sort((a, b) => new Date(b.start!).getTime() - new Date(a.start!).getTime());
+
+    return { upcomingEvents, pastEvents };
   }, [events, searchQuery, hasLocationFilter, filteredByLocation]);
 
   if (loading) {
@@ -151,10 +161,9 @@ export default function Events() {
       <div className="container mx-auto px-4 py-12">
         <Skeleton className="h-12 w-64 mb-8" />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {new Array(6).fill(null).map(() => {
-            const key = String(Math.random());
-            return <Skeleton key={key} className="h-96 rounded-lg" />;
-          })}
+          {new Array(6).fill(null).map((_, i) => (
+            <Skeleton key={i} className="h-96 rounded-lg" />
+          ))}
         </div>
       </div>
     );
@@ -178,82 +187,85 @@ export default function Events() {
         <div className="mb-8 max-w-2xl mx-auto flex gap-3 items-center">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-teal-400" />
-          <Input
-            type="text"
-            placeholder="Search events by title or description..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 py-6 text-base"
-          />
-        </div>
-        <Dialog open={isMapSearchOpen} onOpenChange={setIsMapSearchOpen}>
-          <DialogTrigger asChild>
-            <Button variant="outline">Map Search</Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Search Events by Location</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="rounded-lg overflow-hidden border bg-white h-96">
-                <MapContainer
-                  center={[searchLat || DEFAULT_CENTER[0], searchLng || DEFAULT_CENTER[1]]}
-                  zoom={12}
-                  scrollWheelZoom
-                  style={{ height: '100%', width: '100%' }}
-                >
-                  <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            <Input
+              type="text"
+              placeholder="Search events by title or description..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 py-6 text-base"
+            />
+          </div>
+
+          {/* Map Search Dialog */}
+          <Dialog open={isMapSearchOpen} onOpenChange={setIsMapSearchOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline">Map Search</Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Search Events by Location</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="rounded-lg overflow-hidden border bg-white h-96">
+                  <MapContainer
+                    center={[searchLat || DEFAULT_CENTER[0], searchLng || DEFAULT_CENTER[1]]}
+                    zoom={12}
+                    scrollWheelZoom
+                    style={{ height: '100%', width: '100%' }}
+                  >
+                    <TileLayer
+                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    <MapPicker onLocationPick={handleLocationPick} />
+                    {searchLat && searchLng && (
+                      <Marker position={[searchLat, searchLng]}>
+                        <Popup>Search Location</Popup>
+                      </Marker>
+                    )}
+                  </MapContainer>
+                </div>
+                <div className="space-y-2">
+                  <Label>Radius (km)</Label>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={100}
+                    value={radiusKm}
+                    onChange={(e) => setRadiusKm(Number.parseFloat(e.target.value) || 1)}
                   />
-                  <MapPicker onLocationPick={handleLocationPick} />
-                  {searchLat && searchLng && (
-                    <Marker position={[searchLat, searchLng]}>
-                      <Popup>Search Location</Popup>
-                    </Marker>
-                  )}
-                </MapContainer>
+                  <p className="text-xs text-gray-500">Click on the map to pick a location, then set radius and search.</p>
+                </div>
+                <div className="flex gap-2 justify-end">
+                  <Button
+                    variant="outline"
+                    onClick={handleGetCurrentLocation}
+                    className="mr-auto"
+                  >
+                    <MapPin className="h-4 w-4 mr-2" /> Use Current Location
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsMapSearchOpen(false)}
+                  >
+                    Close
+                  </Button>
+                  <Button
+                    className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white"
+                    disabled={searchLat === null || searchLng === null}
+                    onClick={() => {
+                      if (searchLat !== null && searchLng !== null) {
+                        handleMapSearch(searchLat, searchLng, radiusKm);
+                      }
+                    }}
+                  >
+                    Search
+                  </Button>
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label>Radius (km)</Label>
-                <Input
-                  type="number"
-                  min={1}
-                  max={100}
-                  value={radiusKm}
-                  onChange={(e) => setRadiusKm(Number.parseFloat(e.target.value) || 1)}
-                />
-                <p className="text-xs text-gray-500">Click on the map to pick a location, then set radius and search.</p>
-              </div>
-              <div className="flex gap-2 justify-end">
-                <Button
-                  variant="outline"
-                  onClick={handleGetCurrentLocation}
-                  className="mr-auto"
-                >
-                  <MapPin className="h-4 w-4 mr-2" /> Use Current Location
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setIsMapSearchOpen(false)}
-                >
-                  Close
-                </Button>
-                <Button
-                  className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white"
-                  disabled={searchLat === null || searchLng === null}
-                  onClick={() => {
-                    if (searchLat !== null && searchLng !== null) {
-                      handleMapSearch(searchLat, searchLng, radiusKm);
-                    }
-                  }}
-                >
-                  Search
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+            </DialogContent>
+          </Dialog>
+
           {(searchQuery || hasLocationFilter) && (
             <Button
               variant="outline"
@@ -265,80 +277,92 @@ export default function Events() {
           )}
         </div>
 
-        {/* Events Grid */}
-        {filteredEvents.length === 0 ? (
+        {/* Upcoming Events */}
+        {upcomingEvents.length > 0 && (
+          <section className="mb-16">
+            <h2 className="text-2xl font-bold text-teal-700 mb-6">Upcoming Events</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {upcomingEvents.map((event) => (
+                <Link key={event.id} to={`/events/${event.id}`}>
+                  {/* Reuse your Card JSX */}
+                  <EventCard event={event} formatDate={formatDate} formatTime={formatTime} />
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Past Events */}
+        {pastEvents.length > 0 && (
+          <>
+            <hr className="my-16 border-gray-300" />
+            <section>
+              <h2 className="text-2xl font-bold text-gray-600 mb-6">Past Events</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 opacity-80">
+                {pastEvents.map((event) => (
+                  <Link key={event.id} to={`/events/${event.id}`}>
+                    <EventCard event={event} formatDate={formatDate} formatTime={formatTime} />
+                  </Link>
+                ))}
+              </div>
+            </section>
+          </>
+        )}
+
+        {/* No Events */}
+        {upcomingEvents.length === 0 && pastEvents.length === 0 && (
           <div className="text-center py-12">
             <Calendar className="h-16 w-16 text-teal-300 mx-auto mb-4" />
-          <p className="text-gray-500 text-lg">
-            {searchQuery ? 'No events found matching your search' : 'No events available at the moment'}
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredEvents.map((event) => (
-            <Link key={event.id} to={`/events/${event.id}`}>
-                <Card className="group h-full overflow-hidden hover:shadow-2xl transition-all duration-300 border-teal-100 hover:border-teal-300 hover:-translate-y-1">
-                  {/* Image Carousel */}
-                  {event.imageUrls && event.imageUrls.length > 0 ? (
-                    <>
-                      <AutoScrollCarousel 
-                        images={event.imageUrls} 
-                        className="h-56"
-                        aspectRatio="h-56"
-                      />
-                      {event.start && (
-                        <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm rounded-lg px-3 py-2 shadow-lg z-10">
-                          <p className="text-xs text-gray-700 font-semibold">
-                            {formatDate(event.start)}
-                          </p>
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <div className="h-56 flex items-center justify-center bg-gradient-to-br from-teal-100 to-cyan-100">
-                      <Calendar className="h-16 w-16 text-teal-300" />
-                    </div>
-                  )}
-
-                  <CardContent className="p-6">
-                    <h3 className="text-xl font-bold mb-2 group-hover:text-teal-700 transition-colors line-clamp-2">
-                      {event.title}
-                    </h3>
-
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-3">{event.description}</p>
-
-                    <div className="space-y-2">
-                      {event.location && (
-                        <div className="flex items-center text-sm text-gray-500">
-                          <MapPin className="h-4 w-4 mr-2 text-teal-600" />
-                          <span className="line-clamp-1">{event.location}</span>
-                        </div>
-                      )}
-
-                      {event.start && event.end && (
-                        <div className="flex items-center text-sm text-gray-500">
-                          <Clock className="h-4 w-4 mr-2 text-cyan-600" />
-                          <span>
-                            {formatTime(event.start)} - {formatTime(event.end)}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    <Badge 
-                      variant="secondary" 
-                      className="mt-4 bg-gradient-to-r from-teal-100 to-cyan-100 text-teal-700"
-                    >
-                      View Event
-                    </Badge>
-                  </CardContent>
-              </Card>
-            </Link>
-          ))}
-        </div>
-      )}
+            <p className="text-gray-500 text-lg">
+              {searchQuery ? 'No events found matching your search' : 'No events available at the moment'}
+            </p>
+          </div>
+        )}
       </div>
       <Footer />
     </div>
+  );
+}
+
+// ✅ Optional: Extract EventCard to keep JSX clean
+function EventCard({ event, formatDate, formatTime }: { event: Event; formatDate: (d?: string) => string | null; formatTime: (d?: string) => string | null }) {
+  return (
+    <Card className="group h-full overflow-hidden hover:shadow-2xl transition-all duration-300 border-teal-100 hover:border-teal-300 hover:-translate-y-1">
+      {event.imageUrls && event.imageUrls.length > 0 ? (
+        <>
+          <AutoScrollCarousel images={event.imageUrls} className="h-56" aspectRatio="h-56" />
+          {event.start && (
+            <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm rounded-lg px-3 py-2 shadow-lg z-10">
+              <p className="text-xs text-gray-700 font-semibold">{formatDate(event.start)}</p>
+            </div>
+          )}
+        </>
+      ) : (
+        <div className="h-56 flex items-center justify-center bg-gradient-to-br from-teal-100 to-cyan-100">
+          <Calendar className="h-16 w-16 text-teal-300" />
+        </div>
+      )}
+      <CardContent className="p-6">
+        <h3 className="text-xl font-bold mb-2 group-hover:text-teal-700 transition-colors line-clamp-2">{event.title}</h3>
+        <p className="text-gray-600 text-sm mb-4 line-clamp-3">{event.description}</p>
+        <div className="space-y-2">
+          {event.location && (
+            <div className="flex items-center text-sm text-gray-500">
+              <MapPin className="h-4 w-4 mr-2 text-teal-600" />
+              <span className="line-clamp-1">{event.location}</span>
+            </div>
+          )}
+          {event.start && event.end && (
+            <div className="flex items-center text-sm text-gray-500">
+              <Clock className="h-4 w-4 mr-2 text-cyan-600" />
+              <span>{formatTime(event.start)} - {formatTime(event.end)}</span>
+            </div>
+          )}
+        </div>
+        <Badge variant="secondary" className="mt-4 bg-gradient-to-r from-teal-100 to-cyan-100 text-teal-700">
+          View Event
+        </Badge>
+      </CardContent>
+    </Card>
   );
 }
