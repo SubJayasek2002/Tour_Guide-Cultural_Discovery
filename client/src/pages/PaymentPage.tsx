@@ -291,39 +291,6 @@ const PaymentPage = () => {
               <span>Secure payment powered by PayHere</span>
             </div>
 
-            {/* Sandbox Test Info */}
-            {PAYHERE_SANDBOX && (
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 space-y-2">
-                <h4 className="font-semibold text-amber-800 text-sm flex items-center gap-2">
-                  🧪 Sandbox Test Mode Active
-                </h4>
-                <p className="text-xs text-amber-700">
-                  <strong>Test Card Numbers:</strong>
-                </p>
-                <ul className="text-xs text-amber-700 space-y-1 ml-2">
-                  <li>• Visa: <code className="bg-amber-100 px-1.5 py-0.5 rounded">4916217501611292</code></li>
-                  <li>• MasterCard: <code className="bg-amber-100 px-1.5 py-0.5 rounded">5307732125531191</code></li>
-                </ul>
-                <p className="text-xs text-amber-600 italic mt-2">
-                  CVV, Name & Expiry: Use any valid values. No real payment processed.
-                </p>
-                <details className="text-xs text-amber-700 mt-3">
-                  <summary className="cursor-pointer font-medium">⚙️ Setup Instructions</summary>
-                  <ol className="ml-4 mt-2 space-y-1">
-                    <li>1. Sign up at <a href="https://sandbox.payhere.lk/merchant/sign-up" target="_blank" rel="noopener noreferrer" className="underline">sandbox.payhere.lk</a></li>
-                    <li>2. Get Merchant ID from Side Menu → Integrations</li>
-                    <li>3. Add domain (localhost) and copy Merchant Secret</li>
-                    <li>4. Update <code className="bg-amber-100 px-1 rounded">application.properties</code>:
-                      <pre className="bg-amber-100 p-2 rounded mt-1 overflow-x-auto">
-payhere.merchant.id=YOUR_MERCHANT_ID
-payhere.merchant.secret=YOUR_MERCHANT_SECRET</pre>
-                    </li>
-                    <li>5. Restart your backend server</li>
-                  </ol>
-                </details>
-              </div>
-            )}
-
             {/* Payment Button */}
             <Button
               onClick={handlePayment}
