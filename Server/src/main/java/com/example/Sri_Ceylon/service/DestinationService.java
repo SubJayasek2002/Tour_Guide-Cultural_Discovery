@@ -33,6 +33,8 @@ public class DestinationService {
         destination.setImageUrls(request.getImageUrls());
         destination.setBestSeasonToVisit(request.getBestSeasonToVisit());
         destination.setLocation(request.getLocation());
+        destination.setLatitude(request.getLatitude());
+        destination.setLongitude(request.getLongitude());
         destination.setTimestamp(LocalDateTime.now());
         destination.setCreatedBy(user);
         
@@ -58,6 +60,12 @@ public class DestinationService {
         }
         if (request.getLocation() != null) {
             destination.setLocation(request.getLocation());
+        }
+        if (request.getLatitude() != null) {
+            destination.setLatitude(request.getLatitude());
+        }
+        if (request.getLongitude() != null) {
+            destination.setLongitude(request.getLongitude());
         }
         
         Destination updatedDestination = destinationRepository.save(destination);
@@ -90,6 +98,8 @@ public class DestinationService {
         response.setImageUrls(destination.getImageUrls());
         response.setBestSeasonToVisit(destination.getBestSeasonToVisit());
         response.setLocation(destination.getLocation());
+        response.setLatitude(destination.getLatitude());
+        response.setLongitude(destination.getLongitude());
         response.setTimestamp(destination.getTimestamp());
         
         if (destination.getCreatedBy() != null) {

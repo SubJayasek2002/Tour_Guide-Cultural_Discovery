@@ -18,8 +18,11 @@ public class UserResponse {
     private String firstName;
     private String lastName;
     private String phoneNumber;
+    private String profileImageUrl;
     private Set<String> roles;
     private boolean enabled;
     private LocalDateTime createdAt;
     private LocalDateTime lastLoginAt;
+    private Set<String> favoriteDestinationIds;
+    private Set<String> favoriteEventIds;
 }

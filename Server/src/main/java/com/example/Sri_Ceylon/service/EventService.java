@@ -34,6 +34,8 @@ public class EventService {
         event.setStart(request.getStart());
         event.setEnd(request.getEnd());
         event.setLocation(request.getLocation());
+        event.setLatitude(request.getLatitude());
+        event.setLongitude(request.getLongitude());
         event.setTimestamp(LocalDateTime.now());
         event.setCreatedBy(user);
         
@@ -62,6 +64,12 @@ public class EventService {
         }
         if (request.getLocation() != null) {
             event.setLocation(request.getLocation());
+        }
+        if (request.getLatitude() != null) {
+            event.setLatitude(request.getLatitude());
+        }
+        if (request.getLongitude() != null) {
+            event.setLongitude(request.getLongitude());
         }
         
         Event updatedEvent = eventRepository.save(event);
@@ -95,6 +103,8 @@ public class EventService {
         response.setStart(event.getStart());
         response.setEnd(event.getEnd());
         response.setLocation(event.getLocation());
+        response.setLatitude(event.getLatitude());
+        response.setLongitude(event.getLongitude());
         response.setTimestamp(event.getTimestamp());
         
         if (event.getCreatedBy() != null) {
