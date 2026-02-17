@@ -47,6 +47,7 @@ export default function ManageEvents() {
   const [uploadingImage, setUploadingImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Upload images from device
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -70,6 +71,7 @@ export default function ManageEvents() {
     }
   };
 
+  // Fetch events on mount
   useEffect(() => {
     fetchEvents();
   }, []);
@@ -77,7 +79,13 @@ export default function ManageEvents() {
   const fetchEvents = async () => {
     try {
       const data = await eventsAPI.getAll();
-      setEvents(data);
+
+      // Sort events by createdAt descending (most recent first)
+      const sortedData = data.sort(
+        ((a: Event, b: Event) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+      );
+
+      setEvents(sortedData);
     } catch (error) {
       console.error('Failed to fetch events:', error);
     } finally {
@@ -140,6 +148,18 @@ export default function ManageEvents() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Validate start date
+    if (!formData.start) {
+      alert('Start date & time is required for upcoming events.');
+      return;
+    }
+    const startDate = new Date(formData.start);
+    const now = new Date();
+    if (startDate < now) {
+      alert('Start date & time must be in the future.');
+      return;
+    }
+
     try {
       if (editingEvent) {
         await eventsAPI.update(editingEvent.id, formData);
@@ -176,6 +196,7 @@ export default function ManageEvents() {
 
   return (
     <div className="container mx-auto px-4 py-12">
+      {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Manage Events</h1>
@@ -187,6 +208,7 @@ export default function ManageEvents() {
         </Button>
       </div>
 
+      {/* Search */}
       <div className="mb-8 max-w-2xl">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -214,7 +236,7 @@ export default function ManageEvents() {
           {filteredEvents.map((event) => (
             <Card key={event.id}>
               <div className="relative h-48 bg-gray-200">
-                {event.imageUrls && event.imageUrls.length > 0 ? (
+                {event.imageUrls?.length > 0 ? (
                   <img
                     src={event.imageUrls[0]}
                     alt={event.title}
@@ -266,6 +288,7 @@ export default function ManageEvents() {
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Title */}
             <div>
               <Label htmlFor="title">Title *</Label>
               <Input
@@ -276,6 +299,7 @@ export default function ManageEvents() {
               />
             </div>
 
+            {/* Description */}
             <div>
               <Label htmlFor="description">Description *</Label>
               <Textarea
@@ -287,6 +311,7 @@ export default function ManageEvents() {
               />
             </div>
 
+            {/* Location */}
             <div>
               <Label htmlFor="location">Location *</Label>
               <Input
@@ -297,38 +322,39 @@ export default function ManageEvents() {
               />
             </div>
 
-            <div>
-              <MapPicker
-                latitude={formData.latitude}
-                longitude={formData.longitude}
-                onLocationSelect={(lat, lng) => {
-                  setFormData({ ...formData, latitude: lat, longitude: lng });
-                }}
-              />
-            </div>
+            {/* Map */}
+            <MapPicker
+              latitude={formData.latitude}
+              longitude={formData.longitude}
+              onLocationSelect={(lat, lng) => setFormData({ ...formData, latitude: lat, longitude: lng })}
+            />
 
+            {/* Start & End */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="start">Start Date & Time</Label>
+                <Label htmlFor="start">Start Date & Time *</Label>
                 <Input
                   id="start"
                   type="datetime-local"
                   value={formData.start}
+                  min={new Date().toISOString().slice(0, 16)}
                   onChange={(e) => setFormData({ ...formData, start: e.target.value })}
+                  required
                 />
               </div>
-
               <div>
                 <Label htmlFor="end">End Date & Time</Label>
                 <Input
                   id="end"
                   type="datetime-local"
                   value={formData.end}
+                  min={formData.start || new Date().toISOString().slice(0, 16)}
                   onChange={(e) => setFormData({ ...formData, end: e.target.value })}
                 />
               </div>
             </div>
 
+            {/* Images */}
             <div>
               <Label>Images</Label>
               <div className="flex gap-2 mb-3">
@@ -342,6 +368,7 @@ export default function ManageEvents() {
                   Add
                 </Button>
               </div>
+
               <div className="flex items-center gap-3 mb-3">
                 <input
                   ref={fileInputRef}
@@ -359,11 +386,7 @@ export default function ManageEvents() {
                   disabled={uploadingImage}
                   className="flex items-center gap-2"
                 >
-                  {uploadingImage ? (
-                    <><Loader2 className="h-4 w-4 animate-spin" /> Uploading...</>
-                  ) : (
-                    <><Upload className="h-4 w-4" /> Upload from Device</>
-                  )}
+                  {uploadingImage ? <><Loader2 className="h-4 w-4 animate-spin" /> Uploading...</> : <><Upload className="h-4 w-4" /> Upload from Device</>}
                 </Button>
                 <span className="text-xs text-gray-400">or paste a URL above</span>
               </div>
@@ -386,13 +409,12 @@ export default function ManageEvents() {
               )}
             </div>
 
+            {/* Buttons */}
             <div className="flex justify-end space-x-2 pt-4">
               <Button type="button" variant="outline" onClick={handleCloseForm}>
                 Cancel
               </Button>
-              <Button type="submit">
-                {editingEvent ? 'Update Event' : 'Create Event'}
-              </Button>
+              <Button type="submit">{editingEvent ? 'Update Event' : 'Create Event'}</Button>
             </div>
           </form>
         </DialogContent>
